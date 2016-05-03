@@ -6,7 +6,7 @@ return [
     "stockClass"        => "\\Stock",
     "employeeClass"     => "\\TenantUser",
 
-    "stocksTable"       => "menu_item_inventory",
+    "stocksTable"       => "stocks",
     "assembliesTable"   => "assemblies",
 
     "usesStockManagementKey"    => "usesStockManagement",
