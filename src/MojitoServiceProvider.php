@@ -12,7 +12,7 @@ class MojitoServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../resources/migrations/' => base_path('database/migrations'),
+            __DIR__.'/../database/migrations/' => base_path('database/migrations'),
         ], 'migrations');
 
         $this->publishes([
