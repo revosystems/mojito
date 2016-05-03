@@ -1,0 +1,17 @@
+{
+    "name": "badchoice/mojito",
+    "description": "Stock management system",
+    "authors": [
+        {
+            "name": "Badchoice",
+            "email": "jordi@gloobus.net"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "BadChoice\\Mojito\\": "src"
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {}
+}
