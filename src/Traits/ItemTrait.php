@@ -38,7 +38,7 @@ trait ItemTrait{
      * @return mixed the Items where this item is assembled to
      */
     public function assembledTo(){
-        return $this->belongsToMany(config('mojito.itemClass','Item'),'menu_item_inventory','item_id','main_item_id')->withPivot('quantity','id','unit_id','deleted_at')->withTimestamps()->wherePivot('deleted_at','=',null);
+        return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.assembliesTable','assemblies'),'item_id','main_item_id')->withPivot('quantity','id','unit_id','deleted_at')->withTimestamps()->wherePivot('deleted_at','=',null);
     }
 
 
@@ -100,7 +100,7 @@ trait ItemTrait{
             $object->delete();
         }
 
-        foreach (\BadChoice\Mojito\Models\MojitoAssembly::byMainItem($this->id)->get() as $object){
+        foreach (\BadChoice\Mojito\Models\Assembly::byMainItem($this->id)->get() as $object){
             $object->delete();
         }
 
