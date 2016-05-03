@@ -1,8 +1,12 @@
 <?php namespace BadChoice\Mojito\Models;
 
 use Exception;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Unit extends \Eloquent{
+
+    use SoftDeletes;
+
     protected $table    = "units";
     protected $guarded  = ['id'];
 
