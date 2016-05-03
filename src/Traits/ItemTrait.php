@@ -2,17 +2,18 @@
 use DB;
 trait ItemTrait{
 
-    protected $usesStockManagementKey = 'usesStockManagement';
 
     //=============================================================================
     // SCOPES
     //=============================================================================
     public function scopeWithStockManagement($query){
-        return $query->where($this->usesStockManagementKey ,'=',1);
+        $usesStockManagementKey = config('mojito.usesStockManagementKey');
+        return $query->where($usesStockManagementKey ,'=',1);
     }
 
     public function scopeWithStockManagementAndNoAssembly($query){
-        return $query->where($this->usesStockManagementKey ,'=',1)->doesntHave('assembliesForScope');
+        $usesStockManagementKey = config('mojito.usesStockManagementKey');
+        return $query->where($usesStockManagementKey ,'=',1)->doesntHave('assembliesForScope');
     }
 
     //=============================================================================
@@ -22,7 +23,6 @@ trait ItemTrait{
      * @return All the assemblies
      */
     public function assemblies(){
-        //TODO: stock table name?
         return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.assembliesTable','assemblies'),'main_item_id','item_id')->withPivot('quantity','id','unit_id','deleted_at')->withTimestamps()->wherePivot('deleted_at','=',null);
     }
 
@@ -65,7 +65,7 @@ trait ItemTrait{
      */
     public function decreaseStock($qty, $warehouse, $weight = 1, $unit_id = null){
 
-        $usesStockManagementKey = $this->usesStockManagementKey;
+        $usesStockManagementKey = config('mojito.usesStockManagementKey');
         if($unit_id == null) $unit_id = $this->unit_id;
 
         if($warehouse != null && $this->$usesStockManagementKey && $qty != 0) {
