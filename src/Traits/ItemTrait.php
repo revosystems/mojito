@@ -2,15 +2,17 @@
 use DB;
 trait ItemTrait{
 
+    protected $usesStockManagementKey = 'usesStockManagement';
+
     //=============================================================================
     // SCOPES
     //=============================================================================
     public function scopeWithStockManagement($query){
-        return $query->where('hasInventory','=',1);
+        return $query->where($this->usesStockManagementKey ,'=',1);
     }
 
     public function scopeWithStockManagementAndNoAssembly($query){
-        return $query->where('hasInventory','=',1)->doesntHave('assembliesForScope');
+        return $query->where($this->usesStockManagementKey ,'=',1)->doesntHave('assembliesForScope');
     }
 
     //=============================================================================
@@ -21,7 +23,7 @@ trait ItemTrait{
      */
     public function assemblies(){
         //TODO: stock table name?
-        return $this->belongsToMany(config('mojito.itemClass','Item'),'menu_item_inventory','main_item_id','item_id')->withPivot('quantity','id','unit_id','deleted_at')->withTimestamps()->wherePivot('deleted_at','=',null);
+        return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.assembliesTable','assemblies'),'main_item_id','item_id')->withPivot('quantity','id','unit_id','deleted_at')->withTimestamps()->wherePivot('deleted_at','=',null);
     }
 
     /**
@@ -29,7 +31,7 @@ trait ItemTrait{
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function assembliesForScope(){
-        return $this->belongsToMany(config('mojito.itemClass','Item'),'menu_item_inventory','main_item_id','item_id')->withTimestamps()->whereNull('menu_item_inventory.deleted_at');
+        return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.assembliesTable','assemblies'),'main_item_id','item_id')->withTimestamps()->whereNull('menu_item_inventory.deleted_at');
     }
 
     /**
@@ -63,16 +65,17 @@ trait ItemTrait{
      */
     public function decreaseStock($qty, $warehouse, $weight = 1, $unit_id = null){
 
+        $usesStockManagementKey = $this->usesStockManagementKey;
         if($unit_id == null) $unit_id = $this->unit_id;
 
-        if($warehouse != null && $this->hasInventory && $qty != 0) {
+        if($warehouse != null && $this->$usesStockManagementKey && $qty != 0) {
             if($this->usesWeight){
                 $qty *= $weight;
             }
 
             if(count($this->assemblies) > 0){
                 foreach ($this->assemblies as $assembledItem) {
-                    if ($assembledItem->hasInventory) {
+                    if ($assembledItem->$usesStockManagementKey) {
                         if( $warehouse->stockByItem($assembledItem) ) { //If item is in warehouse
                             $warehouse->add($assembledItem->id, -($qty * $assembledItem->pivot->quantity), $assembledItem->pivot->unit_id);
                         }

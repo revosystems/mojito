@@ -6,7 +6,7 @@ class Assembly extends \Eloquent {
 
     use SoftDeletes;
 
-    protected $table    = "item_assemblies";
+    protected $table    = "assemblies";
     protected $dates    = ['deleted_at'];
     protected $hidden   = ['created_at','updated_at','deleted_at'];
     protected $guarded  = [];

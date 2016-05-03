@@ -5,8 +5,6 @@ class StockMovement extends \Eloquent{
     protected $table            = "stock_movements";
     protected $guarded          = [];
 
-    protected $employeeClass    = 'TenantUser';
-
     const SOURCE_SALE           = 0;
     const SOURCE_REVO_STOCKS    = 1;
     const SOURCE_PURCHASE       = 2;
