@@ -7,11 +7,14 @@
             "email": "jordi@gloobus.net"
         }
     ],
+    "require": {
+        "php": ">=5.4.0",
+        "badchoice/grog": "5.2.*",
+    },
     "autoload": {
         "psr-4": {
             "BadChoice\\Mojito\\": "src"
         }
     },
-    "minimum-stability": "stable",
-    "require": {}
+    "minimum-stability": "stable"
 }

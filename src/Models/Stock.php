@@ -1,7 +1,7 @@
 <?php namespace BadChoice\Mojito\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
-use BadChoice\Mojito\Traits\SyncTrait;
+use BadChoice\Grog\Traits\SyncTrait;
 
 class Stock extends \Eloquent{
 
