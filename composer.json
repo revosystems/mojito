@@ -9,7 +9,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "badchoice/grog": "dev-master"
+        "badchoice/grog": "~1.0"
     },
     "autoload": {
         "psr-4": {
