@@ -2,6 +2,7 @@
 use DB;
 trait ItemTrait{
 
+
     //=============================================================================
     // SCOPES
     //=============================================================================
@@ -87,6 +88,33 @@ trait ItemTrait{
                 }
             }
         }
+    }
+
+    public static function syncStock($fromDate, $warehouse_id = null){
+        $stockClass         = config('mojito.stockClass','Stock');
+        $inventorySynced    = $stockClass::sync($fromDate);
+        $synced             = [];
+
+        if($inventorySynced["new"] != null) {
+            foreach ($inventorySynced["new"] as $object) {
+                if ($object["warehouse_id"] == $warehouse_id)
+                    $synced[] = ["id" => $object["item_id"], "inventory" => $object["quantity"], "alert" => $object["alert"]];
+            }
+        }
+        if($inventorySynced["updated"] != null) {
+            foreach ($inventorySynced["updated"] as $object) {
+                if ($object["warehouse_id"] == $warehouse_id)
+                    $synced[] = ["id" => $object["item_id"], "inventory" => $object["quantity"], "alert" => $object["alert"]];
+            }
+        }
+        if($inventorySynced["deleted"] != null) {
+            foreach ($inventorySynced["deleted"] as $object) {
+                if ($object["warehouse_id"] == $warehouse_id)
+                    $synced[] = ["id" => $object["item_id"], "inventory" => 0, "alert" => $object["alert"]];
+            }
+        }
+
+        return $synced;
     }
 
 

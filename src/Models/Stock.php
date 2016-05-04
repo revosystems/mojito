@@ -1,10 +1,12 @@
 <?php namespace BadChoice\Mojito\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use BadChoice\Mojito\Traits\SyncTrait;
 
 class Stock extends \Eloquent{
 
     use SoftDeletes;
+    use SyncTrait;
 
     protected $dates            = ['deleted_at'];
     protected $hidden           = ['created_at','updated_at','deleted_at'];
@@ -50,7 +52,7 @@ class Stock extends \Eloquent{
     //============================================================================
     public static function softDelete($item_id, $warehouse_id){
         static::where('item_id',$item_id)
-                ->where('warehouse_id',$warehouse_id)
-                ->first()->delete();
+            ->where('warehouse_id',$warehouse_id)
+            ->first()->delete();
     }
 }

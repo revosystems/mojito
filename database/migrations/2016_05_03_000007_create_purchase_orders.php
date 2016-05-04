@@ -46,7 +46,7 @@ class CreatePurchaseOrders extends Migration
             $table->foreign('order_id')->references('id')->on('purchase_orders')->onDelete('cascade');
 
             $table->integer('item_vendor_id')->unsigned()->nullable();
-            $table->foreign('item_vendor_id')->references('id')->on('menu_item_vendor')->onDelete('cascade');
+            $table->foreign('item_vendor_id')->references('id')->on('item_vendor')->onDelete('cascade');
 
             $table->timestamps();
             $table->softDeletes();

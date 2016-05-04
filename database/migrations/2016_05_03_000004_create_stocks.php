@@ -24,7 +24,7 @@ class CreateStocks extends Migration
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
 
             $table->integer('item_id')->unsigned();
-            $table->foreign('item_id')->references('id')->on('menu_items')->onDelete('cascade');
+            $table->foreign('item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');
 
             $table->integer('unit_id')->unsigned()->default(1);
             $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
@@ -38,7 +38,7 @@ class CreateStocks extends Migration
             $table->increments('id');
 
             $table->integer('item_id')->unsigned();
-            $table->foreign('item_id')->references('id')->on('menu_items')->onDelete('cascade');
+            $table->foreign('item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');
 
             $table->integer('from_warehouse_id')->unsigned()->nullable();
             $table->foreign('from_warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');

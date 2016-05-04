@@ -19,10 +19,10 @@ class CreateAssemblies extends Migration
             $table->decimal('quantity',8,2)->default('1');
 
             $table->integer('main_item_id')->unsigned();
-            $table->foreign('main_item_id')->references('id')->on('menu_items')->onDelete('cascade');
+            $table->foreign('main_item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');
 
             $table->integer('item_id')->unsigned();
-            $table->foreign('item_id')->references('id')->on('menu_items')->onDelete('cascade');
+            $table->foreign('item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');
 
             $table->integer('unit_id')->unsigned()->default(1);
             $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');

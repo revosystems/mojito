@@ -44,7 +44,7 @@ class CreateVendors extends Migration
             $table->foreign ('unit_id')->references('id')->on('units')->onDelete('cascade');
 
             $table->integer ('item_id')->unsigned()->nullable();
-            $table->foreign ('item_id')->references('id')->on('menu_items')->onDelete('cascade');
+            $table->foreign ('item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');
 
             $table->integer ('vendor_id')->unsigned()->nullable();
             $table->foreign ('vendor_id')->references('id')->on('vendors')->onDelete('cascade');

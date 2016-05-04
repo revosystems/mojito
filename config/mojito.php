@@ -8,6 +8,7 @@ return [
 
     "stocksTable"       => "stocks",
     "assembliesTable"   => "assemblies",
+    "itemsTable"        => "products",
 
     "usesStockManagementKey"    => "usesStockManagement",
 ];
