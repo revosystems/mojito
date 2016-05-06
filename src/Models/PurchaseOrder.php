@@ -8,6 +8,8 @@ class PurchaseOrder extends \Eloquent {
 
     protected $table    = "purchase_orders";
     protected $guarded  = ['id'];
+    protected $appends  = ['vendorName','contentsArray'];
+    protected $hidden   = ['vendor','contents'];
 
     //============================================================================
     // RELATIONSHIPS
@@ -25,6 +27,21 @@ class PurchaseOrder extends \Eloquent {
     //============================================================================
     public function scopeByStatus($query,$status){
         return $query->where('status','=',$status);
+    }
+
+    public function scopeActive($query){
+        return $query->where    ('status', '=', PurchaseOrderContent::STATUS_PENDING)
+                     ->orWhere  ('status', '=', PurchaseOrderContent::STATUS_PARTIAL_RECEIVED);
+    }
+
+    //============================================================================
+    // JSON ATTRIBUTES
+    //============================================================================
+    public function getVendorNameAttribute(){
+        return $this->vendor->name;
+    }
+    public function getContentsArrayAttribute(){
+        return $this->contents;
     }
 
     //============================================================================
@@ -62,8 +79,7 @@ class PurchaseOrder extends \Eloquent {
 
     public function receiveAll($warehouse_id){
         foreach($this->contents as $content){
-            $content->receive($content->quantity - $content->received, $content->vendorItem->pack,$warehouse_id);
+            $content->receive($content->quantity - $content->received, $warehouse_id);
         }
     }
-
 }

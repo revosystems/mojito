@@ -7,6 +7,8 @@ class PurchaseOrderContent extends \Eloquent {
 
     protected $table    = "purchase_order_contents";
     protected $guarded  = ['id'];
+    protected $appends  = ['itemName','itemBarcode'];
+    protected $hidden   = ['item','vendorItem'];
 
     const STATUS_PENDING            = 0;
     const STATUS_SENT               = 1;
@@ -47,6 +49,17 @@ class PurchaseOrderContent extends \Eloquent {
     public function vendorItem(){
         return $this->belongsTo('BadChoice\Mojito\Models\VendorItemPivot','item_vendor_id');
     }
+
+    //============================================================================
+    // JSON APPENDS
+    //============================================================================
+    public function getItemNameAttribute(){
+        return $this->vendorItem->item->name;
+    }
+    public function getItemBarcodeAttribute(){
+        return $this->vendorItem->item->barcode;
+    }
+
 
     //============================================================================
     // METHODS
