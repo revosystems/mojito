@@ -33,13 +33,18 @@ class Vendor extends \Eloquent {
     // RELATIONSHIPS
     //============================================================================
     public function items(){
-        //TODO: Vendor items table?
         return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.vendorItemsTable'),'vendor_id','item_id')->withPivot('id','costPrice','unit_id','reference','tax_id','pack')->wherePivot('deleted_at','=',null);
     }
 
     //============================================================================
     // MEHTODS
     //============================================================================
+    public function addItem($item_id,$unit_id){
+        $this->items()->attach($item_id,[
+            "unit_id" => $unit_id
+        ]);
+    }
+
     public function automaticPurchaseOrder(){
         $toReturn = [];
         foreach($this->items as $item){
@@ -71,12 +76,9 @@ class Vendor extends \Eloquent {
     }
 
     public function delete(){
-
         foreach (VendorItemPivot::byVendor($this->id)->get() as $object){
             $object->delete();
         }
-
         return parent::delete();
     }
-
 }
