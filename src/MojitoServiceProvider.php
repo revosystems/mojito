@@ -27,7 +27,6 @@ class MojitoServiceProvider extends ServiceProvider
             __DIR__.'/../config/mojito.php' => config_path('mojito.php'),
         ], 'config');
 
-
     }
 
     /**

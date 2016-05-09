@@ -34,7 +34,7 @@ class Vendor extends \Eloquent {
     //============================================================================
     public function items(){
         //TODO: Vendor items table?
-        return $this->belongsToMany(config('mojito.itemClass','Item'),'menu_item_vendor','vendor_id','item_id')->withPivot('id','costPrice','unit_id','reference','tax_id','pack')->wherePivot('deleted_at','=',null);
+        return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.vendorItemsTable'),'vendor_id','item_id')->withPivot('id','costPrice','unit_id','reference','tax_id','pack')->wherePivot('deleted_at','=',null);
     }
 
     //============================================================================

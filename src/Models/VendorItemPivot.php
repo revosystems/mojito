@@ -5,8 +5,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class VendorItemPivot extends \Eloquent {
     use SoftDeletes;
 
-    protected $table        = "menu_item_vendor";
-
     protected $dates        = ['deleted_at'];
     protected $hidden       = ['created_at','updated_at','deleted_at'];
     protected $guarded      = ['id'];
@@ -15,6 +13,11 @@ class VendorItemPivot extends \Eloquent {
         'costPrice'     => 'required|numeric',
     ];
 
+
+    public function __construct()
+    {
+        $this->table = config('mojito.vendorItemsTable');
+    }
     //============================================================================
     // SCOPES
     //============================================================================
