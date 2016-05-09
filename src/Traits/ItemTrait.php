@@ -2,7 +2,6 @@
 use DB;
 trait ItemTrait{
 
-
     //=============================================================================
     // SCOPES
     //=============================================================================
@@ -14,6 +13,17 @@ trait ItemTrait{
     public function scopeWithStockManagementAndNoAssembly($query){
         $usesStockManagementKey = config('mojito.usesStockManagementKey');
         return $query->where($usesStockManagementKey ,'=',1)->doesntHave('assembliesForScope');
+    }
+
+    //=============================================================================
+    // RELATIONSHIPS
+    //=============================================================================
+    public function warehouses(){
+        return $this->belongsToMany(config('mojito.warehouseClass'),'stocks','item_id','warehouse_id');
+    }
+
+    public function stocks(){
+        return $this->hasMany(config('mojito.stockClass'),'item_id');
     }
 
     //=============================================================================
