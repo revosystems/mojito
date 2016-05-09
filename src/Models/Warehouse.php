@@ -22,6 +22,10 @@ class Warehouse extends \Eloquent {
     //============================================================================
     // RELATIONSHIPS
     //============================================================================
+    public function stocks(){
+        return $this->hasMany(config('mojito.stockClass'),'warehouse_id');
+    }
+
     public function stockByItem($menuItem){
         $stockClass = config('mojito.stockClass','Stock');
         return $stockClass ::where('warehouse_id','=',$this->id)->where('item_id','=',$menuItem->id)->first();
