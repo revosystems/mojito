@@ -20,8 +20,14 @@ class MojitoServiceProvider extends ServiceProvider
         ], 'translations');
 
         $this->publishes([
+            __DIR__.'/../resources/forms/' => base_path('resources/forms'),
+        ], 'forms');
+
+        $this->publishes([
             __DIR__.'/../config/mojito.php' => config_path('mojito.php'),
         ], 'config');
+
+
     }
 
     /**
