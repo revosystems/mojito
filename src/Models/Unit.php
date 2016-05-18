@@ -23,6 +23,14 @@ class Unit extends \Eloquent{
         $query->where('main_unit','=',$mainUnit);
     }
 
+    public function unitFor($mainUnit,$conversion,$shouldCreate = false){
+        $unit = Unit::where('main_unit','=',$mainUnit)->where('conversion','=',$conversion)->first();
+        if($unit == null && $shouldCreate){
+            $unit = Unit::create(['main_unit' => $mainUnit, 'conversion' => $conversion , 'name' => $conversion . Unit::getMainUnitName($mainUnit)]);
+        }
+        return $unit;
+    }
+
     //====================================================================
     // METHODS
     //====================================================================
