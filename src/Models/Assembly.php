@@ -11,6 +11,11 @@ class Assembly extends \Eloquent {
     protected $hidden   = ['created_at','updated_at','deleted_at'];
     protected $guarded  = [];
 
+    public function __construct()
+    {
+        $this->table = config('mojito.assembliesTable');
+    }
+
     //============================================================================
     // SCOPES
     //============================================================================
