@@ -26,7 +26,7 @@ class Unit extends \Eloquent{
     public static function unitFor($mainUnit,$conversion,$shouldCreate = false){
         $unit = Unit::where('main_unit','=',$mainUnit)->where('conversion','=',$conversion)->first();
         if($unit == null && $shouldCreate){
-            $unit = Unit::create(['main_unit' => $mainUnit, 'conversion' => $conversion , 'name' => $conversion . Unit::getMainUnitName($mainUnit)]);
+            $unit = Unit::create(['main_unit' => $mainUnit, 'conversion' => $conversion , 'name' => $conversion . ' ' . Unit::getMainUnitName($mainUnit)]);
         }
         return $unit;
     }
