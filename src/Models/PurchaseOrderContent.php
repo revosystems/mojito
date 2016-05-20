@@ -92,4 +92,13 @@ class PurchaseOrderContent extends \Eloquent {
         else if($status == static::STATUS_RECEIVED)         return trans('admin.received');
         return "?";
     }
+
+    public static function statusArray(){
+        return [
+            static::STATUS_PENDING              => trans('admin.pending'),
+            static::STATUS_SENT                 => trans('admin.sent'),
+            static::STATUS_PARTIAL_RECEIVED     => trans('admin.partialReceived'),
+            static::STATUS_RECEIVED             => trans('admin.received'),
+        ];
+    }
 }

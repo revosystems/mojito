@@ -51,6 +51,17 @@ trait ItemTrait{
         return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.assembliesTable','assemblies'),'item_id','main_item_id')->withPivot('quantity','id','unit_id','deleted_at')->withTimestamps()->wherePivot('deleted_at','=',null);
     }
 
+    public function assemblyPrice(){
+        $price = 0;
+        foreach($this->assemblies as $assembly){
+            $price+= $assembly->costPrice * $assembly->pivot->quantity;
+        }
+        return $price;
+    }
+
+    public function hasAssemblies(){
+        return count($this->assemblies) > 0;
+    }
 
     //=============================================================================
     // STOCK
