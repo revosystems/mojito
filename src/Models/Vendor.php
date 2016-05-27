@@ -26,7 +26,7 @@ class Vendor extends \Eloquent {
     // PARENT FUNCTIONS
     //============================================================================
     public static function canBeDeleted($id){
-        return true;
+        return count(Vendor::find($id)->orders) == 0;
     }
 
     //============================================================================
@@ -34,6 +34,10 @@ class Vendor extends \Eloquent {
     //============================================================================
     public function items(){
         return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.vendorItemsTable'),'vendor_id','item_id')->withPivot('id','costPrice','unit_id','reference','tax_id','pack')->wherePivot('deleted_at','=',null);
+    }
+
+    public function orders(){
+        return $this->hasMany('BadChoice\Mojito\Models\PurchaseOrder');
     }
 
     //============================================================================
