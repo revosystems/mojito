@@ -27,6 +27,10 @@ class Assembly extends \Eloquent {
         return $this->belongsTo(config('mojito.itemClass'),'main_item_id');
     }
 
+    public function unit(){
+        return $this->belongsTo(Unit::class);
+    }
+
     //============================================================================
     // SCOPES
     //============================================================================
