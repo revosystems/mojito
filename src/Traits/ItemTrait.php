@@ -1,5 +1,6 @@
 <?php namespace BadChoice\Mojito\Traits;
 use DB;
+use BadChoice\Mojito\Models\Unit;
 trait ItemTrait{
 
     //=============================================================================
@@ -24,6 +25,10 @@ trait ItemTrait{
 
     public function stocks(){
         return $this->hasMany(config('mojito.stockClass'),'item_id');
+    }
+
+    public function unit(){
+        return $this->belongsTo(Unit::class);
     }
 
     //=============================================================================
