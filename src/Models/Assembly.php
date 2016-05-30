@@ -17,6 +17,17 @@ class Assembly extends \Eloquent {
     }
 
     //============================================================================
+    // RELATIONSHIPS
+    //============================================================================
+    public function item(){
+        return $this->belongsTo(config('mojito.itemClass'));
+    }
+
+    public function mainItem(){
+        return $this->belongsTo(config('mojito.itemClass'),'main_item_id');
+    }
+
+    //============================================================================
     // SCOPES
     //============================================================================
     public function scopeByMainItem($query,$id){
