@@ -36,6 +36,8 @@ class MojitoServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton('mojito', function ($app) {
+            return new Mojito();
+        });
     }
 }
