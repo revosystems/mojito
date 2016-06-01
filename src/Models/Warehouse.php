@@ -144,7 +144,7 @@ class Warehouse extends \Eloquent {
     public function setInventory($itemId, $qty, $unit_id = null){
         $stockClass = config('mojito.stockClass','Stock');
         $pivot = $stockClass::where('warehouse_id','=',$this->id)->where('item_id','=',$itemId)->first();
-        if($unit_id == null) $unit_id = $pivot->item()->unit_id;
+        if($unit_id == null) $unit_id = $pivot->item->unit_id;
         if($pivot == null){
             $stockClass::create([
                 'warehouse_id' => $this->id,
