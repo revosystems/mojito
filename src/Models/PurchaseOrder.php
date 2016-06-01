@@ -38,7 +38,7 @@ class PurchaseOrder extends \Eloquent {
     // JSON ATTRIBUTES
     //============================================================================
     public function getVendorNameAttribute(){
-        return $this->vendor->name;
+        return ($this->vendor) ? $this->vendor->name : "Vendor Deleted";
     }
     public function getContentsArrayAttribute(){
         return $this->contents;
