@@ -59,7 +59,8 @@ trait ItemTrait{
     public function assemblyPrice(){
         $price = 0;
         foreach($this->assemblies as $assembly){
-            $price+= $assembly->costPrice * $assembly->pivot->quantity;
+            $finalQty = Unit::convert($assembly->pivot->quantity,$assembly->pivot->unit_id,$assembly->unit_id);
+            $price+= $assembly->costPrice * $finalQty;
         }
         return $price;
     }
