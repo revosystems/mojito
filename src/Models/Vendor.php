@@ -45,7 +45,8 @@ class Vendor extends \Eloquent {
     //============================================================================
     public function addItem($item_id,$unit_id){
         $this->items()->attach($item_id,[
-            "unit_id" => $unit_id
+            "unit_id" => $unit_id,
+            "pack"    => 1,
         ]);
     }
 
