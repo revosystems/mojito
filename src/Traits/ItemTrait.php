@@ -11,6 +11,11 @@ trait ItemTrait{
         return $query->where($usesStockManagementKey ,'=',1);
     }
 
+    public function scopeWithStockManagementAndAssembly($query){
+        $usesStockManagementKey = config('mojito.usesStockManagementKey');
+        return $query->where($usesStockManagementKey ,'=',1)->has('assembliesForScope');
+    }
+
     public function scopeWithStockManagementAndNoAssembly($query){
         $usesStockManagementKey = config('mojito.usesStockManagementKey');
         return $query->where($usesStockManagementKey ,'=',1)->doesntHave('assembliesForScope');
