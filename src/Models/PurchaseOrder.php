@@ -11,6 +11,10 @@ class PurchaseOrder extends \Eloquent {
     protected $appends  = ['vendorName','contentsArray'];
     protected $hidden   = ['vendor','contents'];
 
+    public static function canBeDeleted($id){
+        return true;
+    }
+
     //============================================================================
     // RELATIONSHIPS
     //============================================================================
