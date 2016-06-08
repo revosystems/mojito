@@ -13,10 +13,12 @@ class VendorItemPivot extends \Eloquent {
         'costPrice'     => 'required|numeric',
     ];
 
-
-    public function __construct()
-    {
+    public function __construct(){
         $this->table = config('mojito.vendorItemsTable');
+    }
+
+    public static function canBeDeleted($id){
+        return true;
     }
     //============================================================================
     // SCOPES
