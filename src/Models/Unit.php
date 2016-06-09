@@ -49,6 +49,10 @@ class Unit extends \Eloquent{
         return $finalQty;
     }
 
+    public function convertToMainUnit($qty){
+        return $qty * $this->conversion;
+    }
+
     public function mainUnitName(){
         return static::getMainUnitName($this->main_unit);
     }
