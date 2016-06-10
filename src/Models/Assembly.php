@@ -1,10 +1,10 @@
 <?php namespace BadChoice\Mojito\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+//use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Assembly extends \Eloquent {
 
-    use SoftDeletes;
+    //use SoftDeletes;
 
     protected $table    = "assemblies";
     protected $dates    = ['deleted_at'];
