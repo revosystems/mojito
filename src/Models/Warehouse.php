@@ -143,7 +143,9 @@ class Warehouse extends \Eloquent {
      */
     public function setInventory($itemId, $qty, $unit_id = null){
         $stockClass = config('mojito.stockClass','Stock');
-        $pivot = $stockClass::where('warehouse_id','=',$this->id)->where('item_id','=',$itemId)->first();
+        $pivot      = $stockClass::where('warehouse_id','=',$this->id)->where('item_id','=',$itemId)->first();
+        $result     = false;
+
         if($pivot == null){
             if($unit_id == null) {
                 $itemClass = config('mojito.itemClass','Item');
@@ -156,7 +158,7 @@ class Warehouse extends \Eloquent {
                 'alert'        => 0,
                 'unit_id'      => $unit_id
             ]);
-            return true;
+            $result = true;
         }
         else{
             $pivot->update(["quantity" => $qty]);
@@ -168,6 +170,6 @@ class Warehouse extends \Eloquent {
             'quantity'          => $qty,
             'action'            => Warehouse::ACTION_SET_INVENTORY
         ]);
-        return false;
+        return $result;
     }
 }
