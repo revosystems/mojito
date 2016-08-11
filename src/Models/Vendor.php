@@ -26,7 +26,10 @@ class Vendor extends \Eloquent {
     // PARENT FUNCTIONS
     //============================================================================
     public static function canBeDeleted($id){
-        return count(Vendor::find($id)->orders) == 0;
+        if(count(Vendor::find($id)->orders) > 0) {
+            throw new \Exception("Vendor has orders");
+        }
+        return true;
     }
 
     //============================================================================
