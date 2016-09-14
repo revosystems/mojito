@@ -36,6 +36,10 @@ trait ItemTrait{
         return $this->belongsTo(Unit::class);
     }
 
+    public function vendors(){
+        return $this->belongsToMany(Vendor::class,config('mojito.vendorItemsTable'),'item_id','vendor_id')->withPivot('id','costPrice','unit_id','reference','tax_id','pack')->wherePivot('deleted_at','=',null);
+    }
+
     //=============================================================================
     // ASSEMBLIES
     //=============================================================================
