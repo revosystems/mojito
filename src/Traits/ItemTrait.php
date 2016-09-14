@@ -1,4 +1,5 @@
 <?php namespace BadChoice\Mojito\Traits;
+use BadChoice\Mojito\Models\Vendor;
 use DB;
 use BadChoice\Mojito\Models\Unit;
 trait ItemTrait{
