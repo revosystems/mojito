@@ -15,6 +15,26 @@ class PurchaseOrder extends \Eloquent {
         return true;
     }
 
+    public static function createWith($vendorId, $items){
+        if(count($items) > 0) {
+            $order = PurchaseOrder::create([
+                'vendor_id' => $vendorId
+            ]);
+
+            foreach ($items as $item) {
+                PurchaseOrderContent::create([
+                    'order_id'          => $order->id,
+                    'status'            => PurchaseOrderContent::STATUS_PENDING,
+                    'price'             => $item->costPrice,
+                    'quantity'          => $item->quantity,
+                    'item_vendor_id'    => $item->pivot_id,
+                ]);
+            }
+            return $order;
+        }
+        return null;
+    }
+
     //============================================================================
     // RELATIONSHIPS
     //============================================================================
