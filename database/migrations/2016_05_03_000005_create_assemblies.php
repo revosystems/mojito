@@ -16,7 +16,7 @@ class CreateAssemblies extends Migration
         {
             // auto increment id (primary key)
             $table->increments('id');
-            $table->decimal('quantity',8,2)->default('1');
+            $table->decimal('quantity',8,3)->default('1');
 
             $table->integer('main_item_id')->unsigned();
             $table->foreign('main_item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');

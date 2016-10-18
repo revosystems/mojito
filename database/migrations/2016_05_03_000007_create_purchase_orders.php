@@ -34,7 +34,7 @@ class CreatePurchaseOrders extends Migration
         {
             $table->increments('id');
             $table->integer('status');
-            $table->integer('quantity');
+            $table->decimal('quantity',8,3);
             $table->integer('received')->default(0);
 
             $table->decimal('price'     ,8,2);

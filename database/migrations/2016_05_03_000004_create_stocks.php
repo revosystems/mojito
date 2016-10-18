@@ -16,8 +16,8 @@ class CreateStocks extends Migration
 
             $table->increments('id');
 
-            $table->decimal('quantity',8,2)         ->default(0);
-            $table->decimal('defaultQuantity',8,2)  ->default(0);
+            $table->decimal('quantity',8,3)         ->default(0);
+            $table->decimal('defaultQuantity',8,3)  ->default(0);
             $table->integer('alert')->default(0);
 
             $table->integer('warehouse_id')->unsigned();
@@ -46,7 +46,7 @@ class CreateStocks extends Migration
             $table->integer('to_warehouse_id')->unsigned();
             $table->foreign('to_warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
 
-            $table->decimal('quantity',8,2);
+            $table->decimal('quantity',8,3);
 
             $table->tinyInteger('action')   ->unsigned()->default(0);
             $table->tinyInteger('source')   ->unsigned()->default(0);
