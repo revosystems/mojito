@@ -1,7 +1,11 @@
 <?php namespace BadChoice\Mojito\Traits;
+use BadChoice\Mojito\Models\Assembly;
 use BadChoice\Mojito\Models\Vendor;
+use BadChoice\Mojito\Models\VendorItemPivot;
 use DB;
 use BadChoice\Mojito\Models\Unit;
+use Illuminate\Database\Eloquent\Model;
+
 trait ItemTrait{
 
     //=============================================================================
@@ -154,6 +158,18 @@ trait ItemTrait{
         return $synced;
     }
 
+    //===================================
+    // Pivot creators
+    //===================================
+    public function newPivot(Model $parent, array $attributes, $table, $exists){
+        if ($table == config('mojito.assembliesTable','assemblies') ) {
+            $pivot = new Assembly($parent, $attributes, $table, $exists);
+            $pivot->attributes = $attributes;
+            return $pivot;
+        }
+        return parent::newPivot($parent, $attributes, $table, $exists);
+    }
+
     //=============================================================================
     // DELETE
     //=============================================================================
@@ -163,11 +179,11 @@ trait ItemTrait{
             $object->delete();
         }
 
-        foreach (\BadChoice\Mojito\Models\Assembly::byMainItem($this->id)->get() as $object){
+        foreach (Assembly::byMainItem($this->id)->get() as $object){
             $object->delete();
         }
 
-        foreach (\BadChoice\Mojito\Models\VendorItemPivot::byItem($this->id)->get() as $object){
+        foreach (VendorItemPivot::byItem($this->id)->get() as $object){
             $object->delete();
         }
     }

@@ -1,6 +1,5 @@
 <?php namespace BadChoice\Mojito\Models;
 
-use GSModel;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseOrder extends \Eloquent {

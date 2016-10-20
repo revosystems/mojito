@@ -1,18 +1,14 @@
 <?php namespace BadChoice\Mojito\Models;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-//use Illuminate\Database\Eloquent\SoftDeletes;
-
-class Assembly extends \Eloquent {
-
-    //use SoftDeletes;
+class Assembly extends Pivot {
 
     protected $table    = "assemblies";
     protected $dates    = ['deleted_at'];
     protected $hidden   = ['created_at','updated_at','deleted_at'];
     protected $guarded  = [];
 
-    public function __construct()
-    {
+    public function __construct(){
         $this->table = config('mojito.assembliesTable');
     }
 
