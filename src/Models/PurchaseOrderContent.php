@@ -35,7 +35,7 @@ class PurchaseOrderContent extends \Eloquent {
     // RELATIONSHIPS
     //============================================================================
     public function order(){
-        return $this->belongsTo('BadChoice\Mojito\Models\PurchaseOrder','order_id');
+        return $this->belongsTo(PurchaseOrder::class,'order_id');
     }
 
     public function vendor(){
@@ -47,7 +47,7 @@ class PurchaseOrderContent extends \Eloquent {
     }
 
     public function vendorItem(){
-        return $this->belongsTo('BadChoice\Mojito\Models\VendorItemPivot','item_vendor_id');
+        return $this->belongsTo(VendorItemPivot::class,'item_vendor_id');
     }
 
     //============================================================================

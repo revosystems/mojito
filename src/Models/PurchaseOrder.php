@@ -38,11 +38,11 @@ class PurchaseOrder extends \Eloquent {
     // RELATIONSHIPS
     //============================================================================
     public function vendor(){
-        return $this->belongsTo('BadChoice\Mojito\Models\Vendor');
+        return $this->belongsTo(Vendor::class);
     }
 
     public function contents(){
-        return $this->hasMany('BadChoice\Mojito\Models\PurchaseOrderContent','order_id');
+        return $this->hasMany(PurchaseOrderContent::class,'order_id');
     }
 
     //============================================================================
