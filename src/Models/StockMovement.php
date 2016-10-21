@@ -22,11 +22,11 @@ class StockMovement extends \Eloquent{
     }
 
     public function fromWarehouse(){
-        return $this->belongsTo('Warehouse','from_warehouse_id');
+        return $this->belongsTo(config('mojito.warehouseClass'),'from_warehouse_id');
     }
 
     public function toWarehouse(){
-        return $this->belongsTo('Warehouse','to_warehouse_id');
+        return $this->belongsTo(config('mojito.warehouseClass'),'to_warehouse_id');
     }
 
     public static function getSourceName($source){

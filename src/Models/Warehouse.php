@@ -6,7 +6,6 @@ class Warehouse extends \Eloquent {
     use SoftDeletes;
 
     protected $table        = "warehouses";
-
     protected $dates        = ['deleted_at'];
     protected $hidden       = ['created_at','updated_at','deleted_at','unit_id'];
     protected $guarded      = [];

@@ -29,7 +29,7 @@ class Stock extends \Eloquent{
     }
 
     public function unit(){
-        return $this->belongsTo('BadChoice\Mojito\Models\Unit');
+        return $this->belongsTo(Unit::class);
     }
 
     //============================================================================
