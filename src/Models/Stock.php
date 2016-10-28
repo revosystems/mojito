@@ -17,6 +17,12 @@ class Stock extends \Eloquent{
         'quantity'  => 'numeric'
     ];
 
+    public static function findWith($item_id,$warehouse_id){
+        return static::where('item_id',$item_id)
+            ->where('warehouse_id',$warehouse_id)
+            ->first();
+    }
+
     //============================================================================
     // RELATIONSHIPS
     //============================================================================
@@ -29,7 +35,7 @@ class Stock extends \Eloquent{
     }
 
     public function unit(){
-        return $this->belongsTo(Unit::class);
+        return $this->belongsTo('BadChoice\Mojito\Models\Unit');
     }
 
     //============================================================================
@@ -51,8 +57,6 @@ class Stock extends \Eloquent{
     // METHODS
     //============================================================================
     public static function softDelete($item_id, $warehouse_id){
-        static::where('item_id',$item_id)
-            ->where('warehouse_id',$warehouse_id)
-            ->first()->delete();
+        static::findWith($item_id,$warehouse_id)->delete();
     }
 }
