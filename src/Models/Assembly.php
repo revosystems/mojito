@@ -15,12 +15,6 @@ class Assembly extends Pivot {
     //============================================================================
     // RELATIONSHIPS
     //============================================================================
-    public static function findWith($mainItemId,$warehouse_id){
-        return static::where('main_item_id',$mainItemId)
-            ->where('item_id',$itemId)
-            ->first();
-    }
-
     public function item(){
         return $this->belongsTo(config('mojito.itemClass'));
     }
@@ -46,12 +40,5 @@ class Assembly extends Pivot {
 
     public function scopeByUnit($query,$id){
         return $query->where('unit_id','=',$id);
-    }
-
-    //============================================================================
-    // SOFT DELETE
-    //============================================================================
-    public static function softDelete($mainItemId,$itemId){
-        static::findWith($mainItemId,$itemId)->delete();
     }
 }
