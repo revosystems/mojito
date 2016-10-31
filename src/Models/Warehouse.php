@@ -1,6 +1,7 @@
 <?php namespace BadChoice\Mojito\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Warehouse extends \Eloquent {
     use SoftDeletes;
@@ -28,6 +29,10 @@ class Warehouse extends \Eloquent {
     public function stockByItem($menuItem){
         $stockClass = config('mojito.stockClass','Stock');
         return $stockClass ::where('warehouse_id','=',$this->id)->where('item_id','=',$menuItem->id)->first();
+    }
+
+    public function stocksToRefill(){
+        return $this->hasMany(config('mojito.stockClass'),'warehouse_id')->where('defaultQuantity','>',DB::raw('quantity'));
     }
 
     //============================================================================
