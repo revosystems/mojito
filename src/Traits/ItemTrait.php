@@ -30,7 +30,7 @@ trait ItemTrait{
     // RELATIONSHIPS
     //=============================================================================
     public function warehouses(){
-        return $this->belongsToMany(config('mojito.warehouseClass'),'stocks','item_id','warehouse_id');
+        return $this->belongsToMany(config('mojito.warehouseClass'),config('mojito.stocksTable'),'item_id','warehouse_id')/*->withPivot('id','quantity','unit_id','defaultQuantity','alert','deleted_at')->withTimestamps()->wherePivot('deleted_at','=',null)*/;
     }
 
     public function stocks(){
