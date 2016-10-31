@@ -56,6 +56,10 @@ class Stock extends \Eloquent{
     //============================================================================
     // METHODS
     //============================================================================
+    public function toRefill(){
+        return $this->defaultQuantity - $this->quantity;
+    }
+
     public static function softDelete($item_id, $warehouse_id){
         static::findWith($item_id,$warehouse_id)->delete();
     }
