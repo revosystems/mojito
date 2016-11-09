@@ -60,7 +60,7 @@ trait ItemTrait{
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function assembliesForScope(){
-        return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.assembliesTable','assemblies'),'main_item_id','item_id')->withTimestamps()->whereNull('menu_item_inventory.deleted_at');
+        return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.assembliesTable','assemblies'),'main_item_id','item_id')->withTimestamps()->whereNull(config('mojito.assembliesTable','assemblies').'.deleted_at');
     }
 
     /**

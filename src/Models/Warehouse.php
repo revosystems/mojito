@@ -1,5 +1,6 @@
 <?php namespace BadChoice\Mojito\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
