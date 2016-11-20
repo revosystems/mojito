@@ -9,10 +9,15 @@ class Assembly extends Pivot {
     protected $hidden   = ['created_at','updated_at','deleted_at'];
     protected $guarded  = [];
 
-    public function __construct(Model $parent, $attributes, $table, $exists = false){
-        parent::__construct($parent, $attributes, $table, $exists);
+    public function __construct(){
         $this->table = config('mojito.assembliesTable');
     }
+
+    //*** Scopes don't work this way? **///
+    /*public function __construct(Model $parent, $attributes, $table, $exists = false){
+        parent::__construct($parent, $attributes, $table, $exists);
+        $this->table = config('mojito.assembliesTable');
+    }*/
 
     //============================================================================
     // RELATIONSHIPS
