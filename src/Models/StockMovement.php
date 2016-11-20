@@ -1,6 +1,8 @@
 <?php namespace BadChoice\Mojito\Models;
 
-class StockMovement extends \Eloquent{
+use Illuminate\Database\Eloquent\Model;
+
+class StockMovement extends Model{
 
     protected $table            = "stock_movements";
     protected $guarded          = [];

@@ -1,9 +1,10 @@
 <?php namespace BadChoice\Mojito\Models;
 
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Unit extends \Eloquent{
+class Unit extends Model{
 
     use SoftDeletes;
 

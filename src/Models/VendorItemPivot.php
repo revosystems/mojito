@@ -1,8 +1,9 @@
 <?php namespace BadChoice\Mojito\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class VendorItemPivot extends \Eloquent {
+class VendorItemPivot extends Model {
     use SoftDeletes;
 
     protected $dates        = ['deleted_at'];
@@ -13,7 +14,8 @@ class VendorItemPivot extends \Eloquent {
         'costPrice'     => 'required|numeric',
     ];
 
-    public function __construct(){
+    public function __construct(array $attributes = array()){
+        parent::__construct($attributes);
         $this->table = config('mojito.vendorItemsTable');
     }
 

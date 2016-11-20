@@ -1,5 +1,6 @@
 <?php namespace BadChoice\Mojito\Models;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Model;
 
 class Assembly extends Pivot {
 
@@ -8,7 +9,8 @@ class Assembly extends Pivot {
     protected $hidden   = ['created_at','updated_at','deleted_at'];
     protected $guarded  = [];
 
-    public function __construct(){
+    public function __construct(Model $parent, $attributes, $table, $exists = false){
+        parent::__construct($parent, $attributes, $table, $exists);
         $this->table = config('mojito.assembliesTable');
     }
 

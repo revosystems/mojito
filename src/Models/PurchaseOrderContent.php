@@ -1,8 +1,9 @@
 <?php namespace BadChoice\Mojito\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PurchaseOrderContent extends \Eloquent {
+class PurchaseOrderContent extends Model {
     use SoftDeletes;
 
     protected $table    = "purchase_order_contents";
@@ -18,8 +19,7 @@ class PurchaseOrderContent extends \Eloquent {
     //============================================================================
     // REGISTER EVENT LISTENRES
     //============================================================================
-    public static function boot()
-    {
+    public static function boot(){
         parent::boot();
         static::saved(function($purchaseOrderContent)
         {

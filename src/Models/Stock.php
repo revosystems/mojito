@@ -1,9 +1,10 @@
 <?php namespace BadChoice\Mojito\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use BadChoice\Grog\Traits\SyncTrait;
 
-class Stock extends \Eloquent{
+class Stock extends Model{
 
     use SoftDeletes;
     use SyncTrait;

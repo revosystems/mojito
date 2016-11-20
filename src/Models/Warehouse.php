@@ -1,10 +1,11 @@
 <?php namespace BadChoice\Mojito\Models;
 
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
-class Warehouse extends \Eloquent {
+class Warehouse extends Model {
     use SoftDeletes;
 
     protected $table        = "warehouses";

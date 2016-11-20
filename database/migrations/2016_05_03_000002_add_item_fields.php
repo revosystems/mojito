@@ -16,7 +16,7 @@ class AddItemFields extends Migration
             $table->boolean('usesStockManagement')  ->default(0);
             $table->boolean('usesWeight')           ->default(0);
 
-            $table->integer('unit_id')->unsigned();
+            $table->integer('unit_id')->unsigned()->default(1);
             $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
         });
     }
