@@ -92,6 +92,7 @@ trait ItemTrait{
      */
     public function calculateStock(){
         $stockClass = config('mojito.stockClass','Stock');
+        //TODO: Should take units in account
         $stock      = $stockClass::byItem($this->id)->groupBy('item_id')->select(DB::raw('sum(quantity) as quantity'))->first();
         if($stock) return $stock->quantity;
         else return 0;

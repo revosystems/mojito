@@ -1,6 +1,5 @@
 <?php namespace BadChoice\Mojito\Models;
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Eloquent\Model;
 
 class Assembly extends Pivot {
 

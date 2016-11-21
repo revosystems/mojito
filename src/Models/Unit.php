@@ -1,5 +1,6 @@
 <?php namespace BadChoice\Mojito\Models;
 
+use BadChoice\Mojito\Exceptions\UnitsNotCompatibleException;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,7 +42,7 @@ class Unit extends Model{
         $destinationUnit    = static::find($destinationUnitId);
 
         if($originUnit->main_unit != $destinationUnit->main_unit){
-            throw new Exception('Units not compatible.');
+            throw new UnitsNotCompatibleException;
         }
 
         $originMainQty = $qty           * $originUnit     ->conversion;
