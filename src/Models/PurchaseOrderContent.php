@@ -73,7 +73,7 @@ class PurchaseOrderContent extends Model {
         $status        = static::STATUS_PENDING;
 
         if($totalReceived < $this->quantity) $status = static::STATUS_PARTIAL_RECEIVED;
-        if($totalReceived == $this->quantity)$status = static::STATUS_RECEIVED;
+        if($totalReceived >= $this->quantity) $status = static::STATUS_RECEIVED;
 
         $this->update([
             'received' => $totalReceived,
