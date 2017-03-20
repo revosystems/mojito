@@ -41,7 +41,7 @@ class Unit extends Model{
         $originUnit         = static::find($originUnitId);
         $destinationUnit    = static::find($destinationUnitId);
 
-        if($originUnit->main_unit != $destinationUnit->main_unit){
+        if (! static::areCompatible($originUnit, $destinationUnit) ){
             throw new UnitsNotCompatibleException;
         }
 
@@ -49,6 +49,10 @@ class Unit extends Model{
         $finalQty      = $originMainQty / $destinationUnit->conversion;
 
         return $finalQty;
+    }
+
+    public static function areCompatible($origin, $destination){
+        return $origin->main_unit == $destination->main_unit;
     }
 
     public function convertToMainUnit($qty){
