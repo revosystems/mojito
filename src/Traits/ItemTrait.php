@@ -162,13 +162,13 @@ trait ItemTrait{
     //===================================
     // Pivot creators
     //===================================
-    public function newPivot(Model $parent, array $attributes, $table, $exists){
+    public function newPivot(Model $parent, array $attributes, $table, $exists, $usingNull = NULL){
         if ($table == config('mojito.assembliesTable','assemblies') ) {
             $pivot = new Assembly($parent, $attributes, $table, $exists);
             $pivot->attributes = $attributes;
             return $pivot;
         }
-        return parent::newPivot($parent, $attributes, $table, $exists);
+        return parent::newPivot($parent, $attributes, $table, $exists, $usingNull);
     }
 
     //=============================================================================
