@@ -76,6 +76,7 @@ class Vendor extends Model {
                     "costPrice" => $item->pivot->costPrice,
                     "pivot_id"  => $item->pivot->id,
                     "quantity"  => $toRefill,
+                    "pack"      => $item->pivot->pack,
                     "unit"      => Unit::find($item->pivot->unit_id)->name,
                 ];
             }
