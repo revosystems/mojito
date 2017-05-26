@@ -53,33 +53,41 @@ class Vendor extends Model {
         ]);
     }
 
-    public function automaticPurchaseOrder(){
+    public function automaticPurchaseOrder($belowAlert = true){
         $toReturn = [];
         foreach($this->items as $item){
 
             $totalQty       = 0;
             $totalDefault   = 0;
+            $totalAlert     = 0;
 
             foreach($item->warehouses as $warehouse){
                 $totalQty     += $warehouse->pivot->quantity;
                 $totalDefault += $warehouse->pivot->defaultQuantity;
+                $totalAlert   += $warehouse->pivot->alert;
             }
 
             $toRefill = $totalDefault - $totalQty;
 
-            if($toRefill > 0){
-
-                $toRefill = $item->pivot->pack*ceil($toRefill/$item->pivot->pack);  //Minium pack size
-
-                $toReturn[$item->id] = [
-                    "name"      => $item->name,
-                    "costPrice" => $item->pivot->costPrice,
-                    "pivot_id"  => $item->pivot->id,
-                    "quantity"  => $toRefill,
-                    "pack"      => $item->pivot->pack,
-                    "unit"      => Unit::find($item->pivot->unit_id)->name,
-                ];
+            if($toRefill <= 0 ) {
+                continue;
             }
+
+            if( ! $belowAlert && $totalQty > $totalAlert ){
+                continue;
+            }
+
+            $toRefill = $item->pivot->pack*ceil($toRefill/$item->pivot->pack);  //Minium pack size
+
+            $toReturn[$item->id] = [
+                "name"      => $item->name,
+                "costPrice" => $item->pivot->costPrice,
+                "pivot_id"  => $item->pivot->id,
+                "quantity"  => $toRefill,
+                "pack"      => $item->pivot->pack,
+                "unit"      => Unit::find($item->pivot->unit_id)->name,
+            ];
+
         }
         return $toReturn;
     }
