@@ -69,7 +69,7 @@ class Vendor extends Model {
 
             $toRefill = $totalDefault - $totalQty;
 
-            if($toRefill <= 0 ) {
+            if($toRefill <= 0 || $totalDefault == 0) {
                 continue;
             }
 
