@@ -74,7 +74,7 @@ class Unit extends Model{
     }
 
     public static function getMainUnitName($mainUnit){
-        if      ($mainUnit == static::STANDARD) return __("admin.standard");
+        if      ($mainUnit == static::STANDARD) return trans_choice("admin.unit", 1);
         else if ($mainUnit == static::KG)       return "KG";
         else if ($mainUnit == static::L)        return "L";
         else if ($mainUnit == static::LBS)      return "LBS";
