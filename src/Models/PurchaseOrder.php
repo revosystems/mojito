@@ -1,38 +1,37 @@
-<?php namespace BadChoice\Mojito\Models;
+<?php
+
+namespace BadChoice\Mojito\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseOrder extends Model {
+
     use SoftDeletes;
 
     protected $table    = "purchase_orders";
     protected $guarded  = ['id'];
-    protected $appends  = ['vendorName','contentsArray'];
-    protected $hidden   = ['vendor','contents'];
+    protected $appends  = ['vendorName', 'contentsArray'];
+    protected $hidden   = ['vendor', 'contents'];
 
     public static function canBeDeleted($id){
         return true;
     }
 
-    public static function createWith($vendorId, $items){
-        if(count($items) > 0) {
-            $order = PurchaseOrder::create([
-                'vendor_id' => $vendorId
-            ]);
+    public static function createWith($vendor_id, $status, $items){
+        if( ! count($items) ) return null;
 
-            foreach ($items as $item) {
-                PurchaseOrderContent::create([
-                    'order_id'          => $order->id,
-                    'status'            => PurchaseOrderContent::STATUS_PENDING,
-                    'price'             => $item->costPrice,
-                    'quantity'          => $item->quantity,
-                    'item_vendor_id'    => $item->pivot_id,
-                ]);
-            }
-            return $order;
+        $order = PurchaseOrder::create( compact('vendor_id', 'status') );
+        foreach ($items as $item) {
+            PurchaseOrderContent::create([
+                'order_id'          => $order->id,
+                'status'            => $order->status,
+                'price'             => $item->costPrice,
+                'quantity'          => $item->quantity,
+                'item_vendor_id'    => $item->pivot_id,
+            ]);
         }
-        return null;
+        return $order;
     }
 
     //============================================================================
@@ -43,14 +42,14 @@ class PurchaseOrder extends Model {
     }
 
     public function contents(){
-        return $this->hasMany(PurchaseOrderContent::class,'order_id');
+        return $this->hasMany(PurchaseOrderContent::class, 'order_id')->withTrashed();
     }
 
     //============================================================================
     // SCOPES
     //============================================================================
-    public function scopeByStatus($query,$status){
-        return $query->where('status','=',$status);
+    public function scopeByStatus($query, $status){
+        return $query->where('status', '=', $status);
     }
 
     public function scopeActive($query){
@@ -76,11 +75,9 @@ class PurchaseOrder extends Model {
      * @return int
      */
     public function calculateTotal(){
-        $total = 0;
-        foreach($this->contents as $content){
-            $total += $content->quantity*$content->price;
-        }
-        return $total;
+        return $this->contents->sum(function ($content) {
+            return $content->quantity * $content->price;
+        });
     }
 
     /**
@@ -102,8 +99,8 @@ class PurchaseOrder extends Model {
     }
 
     public function receiveAll($warehouse_id){
-        foreach($this->contents as $content){
+        $this->contents->each(function ($content) use ($warehouse_id) {
             $content->receive($content->quantity - $content->received, $warehouse_id);
-        }
+        });
     }
 }

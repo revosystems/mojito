@@ -41,7 +41,7 @@ class VendorItemPivot extends Model {
     // RELATIONSHIPS
     //============================================================================
     public function item(){
-        return $this->belongsTo(config('mojito.itemClass','Item'),'item_id');
+        return $this->belongsTo(config('mojito.itemClass','Item'),'item_id')->withTrashed();
     }
 
     public function vendor(){
