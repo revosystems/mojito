@@ -21,33 +21,34 @@ class PurchaseOrder extends Model {
     public static function createWith($vendor_id, $items, $status = PurchaseOrderContent::STATUS_PENDING){
         if( ! count($items) ) return null;
 
-        $order = PurchaseOrder::create( compact('vendor_id', 'status') );
-        foreach ($items as $item) {
-            PurchaseOrderContent::create([
-                'order_id'          => $order->id,
-                'status'            => $order->status,
-                'price'             => $item->costPrice,
-                'quantity'          => $item->quantity,
-                'item_vendor_id'    => $item->pivot_id,
-            ]);
-        }
-        return $order;
+        return tap(PurchaseOrder::create( compact('vendor_id', 'status') ), function ($order) use ($items) {
+            return $order->contents()->createMany(collect($items)->map(function ($item) use ($order) {
+                return (new PurchaseOrderContent([
+                    'status'         => $order->status,
+                    'price'          => $item->costPrice,
+                    'quantity'       => $item->quantity,
+                    'item_vendor_id' => $item->pivot_id,
+                ]))->makeHidden(['itemName', 'itemBarcode']);
+            })->toArray());
+        });
     }
 
     public static function updateWith($order, $items, $status = PurchaseOrderContent::STATUS_PENDING) {
+        if( ! count($items) ) return null;
+
         $order->update(compact("status"));
-        PurchaseOrderContent::whereOrderId($order->id)->whereNotIn('id', array_pluck($items, 'id'))->delete();
-        foreach ($items as $item) {
+        PurchaseOrderContent::whereOrderId($order->id)->whereNotIn('id', collect($items)->pluck('id'))->delete();
+        collect($items)->each(function ($item) use ($order) {
             PurchaseOrderContent::updateOrCreate([
-                'id'                => $item->id,
-                'order_id'          => $order->id,
-                'item_vendor_id'    => $item->pivot_id,
+                'id'             => $item->id,
+                'order_id'       => $order->id,
+                'item_vendor_id' => $item->pivot_id,
             ], [
-                'status'           => $order->status,
-                'price'             => $item->costPrice,
-                'quantity'          => $item->quantity,
+                'status'   => $order->status,
+                'price'    => $item->costPrice,
+                'quantity' => $item->quantity,
             ]);
-        }
+        });
         return $order;
     }
     //============================================================================
