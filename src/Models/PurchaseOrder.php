@@ -42,7 +42,7 @@ class PurchaseOrder extends Model {
     }
 
     public function contents(){
-        return $this->hasMany(PurchaseOrderContent::class, 'order_id')->withTrashed();
+        return $this->hasMany(PurchaseOrderContent::class, 'order_id');
     }
 
     //============================================================================
@@ -89,9 +89,10 @@ class PurchaseOrder extends Model {
         $received       = $this->contents->sum('received');
         $leftToReceive  = $total - $received;
 
-        if ($leftToReceive == 0)            return PurchaseOrderContent::STATUS_RECEIVED;
-        else if ($leftToReceive == $total)  return PurchaseOrderContent::STATUS_PENDING;
-        else                                return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
+        if ( $this->status == PurchaseOrderContent::STATUS_DRAFT )  return PurchaseOrderContent::STATUS_DRAFT;
+        else if ($leftToReceive == 0)                               return PurchaseOrderContent::STATUS_RECEIVED;
+        else if ($leftToReceive == $total)                          return PurchaseOrderContent::STATUS_PENDING;
+        else                                                        return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
     }
 
     public function statusName(){
