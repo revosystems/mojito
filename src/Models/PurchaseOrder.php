@@ -1,38 +1,55 @@
-<?php namespace BadChoice\Mojito\Models;
+<?php
+
+namespace BadChoice\Mojito\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseOrder extends Model {
+
     use SoftDeletes;
 
     protected $table    = "purchase_orders";
     protected $guarded  = ['id'];
-    protected $appends  = ['vendorName','contentsArray'];
-    protected $hidden   = ['vendor','contents'];
+    protected $appends  = ['vendorName', 'contentsArray'];
+    protected $hidden   = ['vendor', 'contents'];
 
     public static function canBeDeleted($id){
         return true;
     }
 
-    public static function createWith($vendorId, $items){
-        if(count($items) > 0) {
-            $order = PurchaseOrder::create([
-                'vendor_id' => $vendorId
-            ]);
+    public static function createWith($vendor_id, $items, $status = PurchaseOrderContent::STATUS_PENDING){
+        if( ! count($items) ) return null;
 
-            foreach ($items as $item) {
-                PurchaseOrderContent::create([
-                    'order_id'          => $order->id,
-                    'status'            => PurchaseOrderContent::STATUS_PENDING,
-                    'price'             => $item->costPrice,
-                    'quantity'          => $item->quantity,
-                    'item_vendor_id'    => $item->pivot_id,
-                ]);
-            }
-            return $order;
-        }
-        return null;
+        return tap(PurchaseOrder::create( compact('vendor_id', 'status') ), function ($order) use ($items) {
+            return $order->contents()->createMany(collect($items)->map(function ($item) use ($order) {
+                return (new PurchaseOrderContent([
+                    'status'         => $order->status,
+                    'price'          => $item->costPrice,
+                    'quantity'       => $item->quantity,
+                    'item_vendor_id' => $item->pivot_id,
+                ]))->makeHidden(['itemName', 'itemBarcode']);
+            })->toArray());
+        });
+    }
+
+    public static function updateWith($order, $items, $status = PurchaseOrderContent::STATUS_PENDING) {
+        if( ! count($items) ) return null;
+
+        $order->update(compact("status"));
+        $order->contents()->whereNotIn('id', collect($items)->pluck('id'))->delete();
+        collect($items)->each(function ($item) use ($order) {
+            PurchaseOrderContent::updateOrCreate([
+                'id'             => $item->id,
+                'order_id'       => $order->id,
+                'item_vendor_id' => $item->pivot_id,
+            ], [
+                'status'   => $order->status,
+                'price'    => $item->costPrice,
+                'quantity' => $item->quantity,
+            ]);
+        });
+        return $order;
     }
 
     //============================================================================
@@ -43,14 +60,14 @@ class PurchaseOrder extends Model {
     }
 
     public function contents(){
-        return $this->hasMany(PurchaseOrderContent::class,'order_id');
+        return $this->hasMany(PurchaseOrderContent::class, 'order_id');
     }
 
     //============================================================================
     // SCOPES
     //============================================================================
-    public function scopeByStatus($query,$status){
-        return $query->where('status','=',$status);
+    public function scopeByStatus($query, $status){
+        return $query->where('status', '=', $status);
     }
 
     public function scopeActive($query){
@@ -76,11 +93,9 @@ class PurchaseOrder extends Model {
      * @return int
      */
     public function calculateTotal(){
-        $total = 0;
-        foreach($this->contents as $content){
-            $total += $content->quantity*$content->price;
-        }
-        return $total;
+        return $this->contents->sum(function ($content) {
+            return $content->quantity * $content->price;
+        });
     }
 
     /**
@@ -92,9 +107,10 @@ class PurchaseOrder extends Model {
         $received       = $this->contents->sum('received');
         $leftToReceive  = $total - $received;
 
-        if ($leftToReceive == 0)            return PurchaseOrderContent::STATUS_RECEIVED;
-        else if ($leftToReceive == $total)  return PurchaseOrderContent::STATUS_PENDING;
-        else                                return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
+        if ( $this->status == PurchaseOrderContent::STATUS_DRAFT )  return PurchaseOrderContent::STATUS_DRAFT;
+        else if ($leftToReceive == 0)                               return PurchaseOrderContent::STATUS_RECEIVED;
+        else if ($leftToReceive == $total)                          return PurchaseOrderContent::STATUS_PENDING;
+        else                                                        return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
     }
 
     public function statusName(){
@@ -102,8 +118,8 @@ class PurchaseOrder extends Model {
     }
 
     public function receiveAll($warehouse_id){
-        foreach($this->contents as $content){
+        $this->contents->each(function ($content) use ($warehouse_id) {
             $content->receive($content->quantity - $content->received, $warehouse_id);
-        }
+        });
     }
 }

@@ -1,28 +1,31 @@
-<?php namespace BadChoice\Mojito\Models;
+<?php
+
+namespace BadChoice\Mojito\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PurchaseOrderContent extends Model {
+
     use SoftDeletes;
 
     protected $table    = "purchase_order_contents";
     protected $guarded  = ['id'];
-    protected $appends  = ['itemName','itemBarcode'];
-    protected $hidden   = ['item','vendorItem'];
+    protected $appends  = ['itemName', 'itemBarcode'];
+    protected $hidden   = ['item', 'vendorItem'];
 
     const STATUS_PENDING            = 0;
     const STATUS_SENT               = 1;
     const STATUS_PARTIAL_RECEIVED   = 2;
     const STATUS_RECEIVED           = 3;
+    const STATUS_DRAFT              = 4;
 
     //============================================================================
     // REGISTER EVENT LISTENRES
     //============================================================================
     public static function boot(){
         parent::boot();
-        static::saved(function($purchaseOrderContent)
-        {
+        static::saved(function($purchaseOrderContent) {
             $po = PurchaseOrder::find($purchaseOrderContent->order_id);
             $po->update([
                 "total"     => $po->calculateTotal(),
@@ -35,7 +38,7 @@ class PurchaseOrderContent extends Model {
     // RELATIONSHIPS
     //============================================================================
     public function order(){
-        return $this->belongsTo(PurchaseOrder::class,'order_id');
+        return $this->belongsTo(PurchaseOrder::class, 'order_id');
     }
 
     public function vendor(){
@@ -47,7 +50,7 @@ class PurchaseOrderContent extends Model {
     }
 
     public function vendorItem(){
-        return $this->belongsTo(VendorItemPivot::class,'item_vendor_id');
+        return $this->belongsTo(VendorItemPivot::class, 'item_vendor_id')->withTrashed();
     }
 
     //============================================================================
@@ -56,16 +59,15 @@ class PurchaseOrderContent extends Model {
     public function getItemNameAttribute(){
         return $this->vendorItem->item->name;
     }
+
     public function getItemBarcodeAttribute(){
         return $this->vendorItem->item->barcode;
     }
 
-
     //============================================================================
     // METHODS
     //============================================================================
-    public function receive($quantity,$warehouseId){
-
+    public function receive($quantity, $warehouseId){
         $warehouse  = Warehouse::find($warehouseId);
         $warehouse->add($this->item()->id, $quantity, $this->vendorItem->unit_id);
 
@@ -86,19 +88,21 @@ class PurchaseOrderContent extends Model {
     }
 
     public static function getStatusName($status){
-        if($status      == static::STATUS_PENDING)          return trans('admin.pending');
-        else if($status == static::STATUS_SENT)             return trans('admin.sent');
-        else if($status == static::STATUS_PARTIAL_RECEIVED) return trans('admin.partialReceived');
-        else if($status == static::STATUS_RECEIVED)         return trans('admin.received');
+        if     ($status == static::STATUS_PENDING)          return __('admin.pending');
+        else if($status == static::STATUS_SENT)             return __('admin.sent');
+        else if($status == static::STATUS_PARTIAL_RECEIVED) return __('admin.partialReceived');
+        else if($status == static::STATUS_RECEIVED)         return __('admin.received');
+        else if($status == static::STATUS_DRAFT)            return __('admin.draft');
         return "?";
     }
 
     public static function statusArray(){
         return [
-            static::STATUS_PENDING              => trans('admin.pending'),
-            static::STATUS_SENT                 => trans('admin.sent'),
-            static::STATUS_PARTIAL_RECEIVED     => trans('admin.partialReceived'),
-            static::STATUS_RECEIVED             => trans('admin.received'),
+            static::STATUS_PENDING              => __('admin.pending'),
+            static::STATUS_SENT                 => __('admin.sent'),
+            static::STATUS_PARTIAL_RECEIVED     => __('admin.partialReceived'),
+            static::STATUS_RECEIVED             => __('admin.received'),
+            static::STATUS_DRAFT                => __('admin.draft'),
         ];
     }
 }
