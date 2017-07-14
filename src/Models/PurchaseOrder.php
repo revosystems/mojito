@@ -18,7 +18,7 @@ class PurchaseOrder extends Model {
         return true;
     }
 
-    public static function createWith($vendor_id, $status, $items){
+    public static function createWith($vendor_id, $items, $status = PurchaseOrderContent::STATUS_PENDING){
         if( ! count($items) ) return null;
 
         $order = PurchaseOrder::create( compact('vendor_id', 'status') );
@@ -34,6 +34,22 @@ class PurchaseOrder extends Model {
         return $order;
     }
 
+    public static function updateWith($order, $items, $status = PurchaseOrderContent::STATUS_PENDING) {
+        $order->update(compact("status"));
+        PurchaseOrderContent::whereOrderId($order->id)->whereNotIn('id', array_pluck($items, 'id'))->delete();
+        foreach ($items as $item) {
+            PurchaseOrderContent::updateOrCreate([
+                'id'                => $item->id,
+                'order_id'          => $order->id,
+                'item_vendor_id'    => $item->pivot_id,
+            ], [
+                'status'           => $order->status,
+                'price'             => $item->costPrice,
+                'quantity'          => $item->quantity,
+            ]);
+        }
+        return $order;
+    }
     //============================================================================
     // RELATIONSHIPS
     //============================================================================
