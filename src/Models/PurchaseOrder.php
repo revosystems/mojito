@@ -21,7 +21,7 @@ class PurchaseOrder extends Model {
     public static function createWith($vendor_id, $items, $status = PurchaseOrderContent::STATUS_PENDING){
         if( ! count($items) ) return null;
 
-        return tap(PurchaseOrder::create( compact('vendor_id', 'status') ), function ($order) use ($items) {
+        $order = tap(PurchaseOrder::create( compact('vendor_id', 'status') ), function ($order) use ($items) {
             return $order->contents()->createMany(collect($items)->map(function ($item) use ($order) {
                 return (new PurchaseOrderContent([
                     'status'         => $order->status,
@@ -31,6 +31,10 @@ class PurchaseOrder extends Model {
                 ]))->makeHidden(['itemName', 'itemBarcode']);
             })->toArray());
         });
+        if ( $order->shouldBeSent() ) {
+            $order->send();
+        }
+        return $order;
     }
 
     public static function updateWith($order, $items, $status = PurchaseOrderContent::STATUS_PENDING) {
@@ -49,6 +53,9 @@ class PurchaseOrder extends Model {
                 'quantity' => $item->quantity,
             ]);
         });
+        if ( $order->shouldBeSent() ) {
+            $order->send();
+        }
         return $order;
     }
 
@@ -122,4 +129,11 @@ class PurchaseOrder extends Model {
             $content->receive($content->quantity - $content->received, $warehouse_id);
         });
     }
+
+    public function shouldBeSent() {
+        return $this->status == PurchaseOrderContent::STATUS_PENDING;
+    }
+
+    public function send() {}
+
 }
