@@ -37,7 +37,7 @@ class PurchaseOrder extends Model {
         if( ! count($items) ) return null;
 
         $order->update(compact("status"));
-        order->contents()->whereNotIn('id', collect($items)->pluck('id'))->delete();
+        $order->contents()->whereNotIn('id', collect($items)->pluck('id'))->delete();
         collect($items)->each(function ($item) use ($order) {
             PurchaseOrderContent::updateOrCreate([
                 'id'             => $item->id,
