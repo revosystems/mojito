@@ -59,6 +59,11 @@ class PurchaseOrder extends Model {
         return $order;
     }
 
+    public function delete() {
+        $this->contents()->delete();
+        return parent::delete();
+    }
+
     //============================================================================
     // RELATIONSHIPS
     //============================================================================
