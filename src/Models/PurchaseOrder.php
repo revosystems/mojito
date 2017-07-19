@@ -110,7 +110,7 @@ class PurchaseOrder extends Model {
         if ( $this->status == PurchaseOrderContent::STATUS_DRAFT )  return PurchaseOrderContent::STATUS_DRAFT;
         else if ($leftToReceive == 0)                               return PurchaseOrderContent::STATUS_RECEIVED;
         else if ($leftToReceive == $total)                          return PurchaseOrderContent::STATUS_PENDING;
-        else                                                        return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
+        return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
     }
 
     public function statusName(){

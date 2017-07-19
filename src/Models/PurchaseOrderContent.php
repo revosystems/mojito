@@ -105,4 +105,26 @@ class PurchaseOrderContent extends Model {
             static::STATUS_DRAFT                => __('admin.draft'),
         ];
     }
+
+    public function updateQuantity($quantity, $warehouseId){
+        if ( ! $quantity || $this->quantity == $quantity ) return;
+        $this->quantity = $quantity;
+        $this->status = $this->calculateStatus();
+        $this->adjustExtraItemsOnStock( $this->quantity - $this->received, $warehouseId );
+    }
+
+    public function calculateStatus() {
+        $leftToReceive  = $this->quantity - $this->received;
+
+        if ( $this->status == PurchaseOrderContent::STATUS_DRAFT )  return PurchaseOrderContent::STATUS_DRAFT;
+        else if ($leftToReceive <= 0)                               return PurchaseOrderContent::STATUS_RECEIVED;
+        else if ($leftToReceive == $this->quanitity)                return PurchaseOrderContent::STATUS_PENDING;
+        return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
+    }
+
+    private function adjustExtraItemsOnStock($leftToReceive, $warehouseId) {
+        if ( $leftToReceive >= 0 ) return;
+        $warehouse  = Warehouse::find($warehouseId);
+        $warehouse->add($this->item()->id, $leftToReceive, $this->vendorItem->unit_id);
+    }
 }
