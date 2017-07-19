@@ -111,16 +111,21 @@ class PurchaseOrderContent extends Model {
     }
 
     public function updateQuantity($quantity, $warehouseId){
-        $this->update(["quantity" => str_replace(',', '.', $quantity), "status" => $this->calculateStatus($quantity)]);
-        $this->adjustExtraItemsOnStock( $this->quantity - $this->received, $warehouseId );
+        $leftToReceive = $quantity - $this->received;
+        $this->update(["quantity" => $quantity, "received" => max($leftToReceive, 0)]);
+        $this->updateStatus();
+        $this->order->updateStatus();
+        $this->adjustExtraItemsOnStock( $leftToReceive, $warehouseId );
     }
 
-    public function calculateStatus($quantity = null) {
-        $quantity = $quantity != null ? $quantity : $this->quantity;
-        $leftToReceive  = $quantity - $this->received;
+    public function updateStatus() {
+        $this->update(["status" => $this->calculateStatus()]);
+    }
 
+    public function calculateStatus() {
+        $leftToReceive  = $this->quantity - $this->received;
         if ( $this->status == PurchaseOrderContent::STATUS_DRAFT )  return PurchaseOrderContent::STATUS_DRAFT;
-        else if ($leftToReceive <= 0)                               return PurchaseOrderContent::STATUS_RECEIVED;
+        else if ($leftToReceive == 0)                               return PurchaseOrderContent::STATUS_RECEIVED;
         else if ($leftToReceive == $this->quanitity)                return PurchaseOrderContent::STATUS_PENDING;
         return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
     }

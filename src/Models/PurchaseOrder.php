@@ -125,6 +125,10 @@ class PurchaseOrder extends Model {
         return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
     }
 
+    public function updateStatus() {
+        $this->update(["status" => $this->calculateStatus()]);
+    }
+
     public function statusName(){
         return PurchaseOrderContent::getStatusName($this->status);
     }
