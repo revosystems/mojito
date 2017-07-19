@@ -106,15 +106,18 @@ class PurchaseOrderContent extends Model {
         ];
     }
 
+    public function updatePrice($price) {
+        $this->update(["price" => str_replace(',', '.', $price)]);
+    }
+
     public function updateQuantity($quantity, $warehouseId){
-        if ( ! $quantity || $this->quantity == $quantity ) return;
-        $this->quantity = $quantity;
-        $this->status = $this->calculateStatus();
+        $this->update(["quantity" => str_replace(',', '.', $quantity), "status" => $this->calculateStatus($quantity)]);
         $this->adjustExtraItemsOnStock( $this->quantity - $this->received, $warehouseId );
     }
 
-    public function calculateStatus() {
-        $leftToReceive  = $this->quantity - $this->received;
+    public function calculateStatus($quantity = null) {
+        $quantity = $quantity != null ? $quantity : $this->quantity;
+        $leftToReceive  = $quantity - $this->received;
 
         if ( $this->status == PurchaseOrderContent::STATUS_DRAFT )  return PurchaseOrderContent::STATUS_DRAFT;
         else if ($leftToReceive <= 0)                               return PurchaseOrderContent::STATUS_RECEIVED;
@@ -124,7 +127,6 @@ class PurchaseOrderContent extends Model {
 
     private function adjustExtraItemsOnStock($leftToReceive, $warehouseId) {
         if ( $leftToReceive >= 0 ) return;
-        $warehouse  = Warehouse::find($warehouseId);
-        $warehouse->add($this->item()->id, $leftToReceive, $this->vendorItem->unit_id);
+        Warehouse::find($warehouseId)->add($this->item()->id, $leftToReceive, $this->vendorItem->unit_id);
     }
 }
