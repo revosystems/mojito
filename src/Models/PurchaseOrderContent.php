@@ -69,7 +69,7 @@ class PurchaseOrderContent extends Model {
     //============================================================================
     public function receive($quantity, $warehouseId){
         $warehouse  = Warehouse::find($warehouseId);
-        $warehouse->add($this->item()->id, $quantity, $this->vendorItem->unit_id);
+        $warehouse->add($this->vendorItem->item_id, $quantity, $this->vendorItem->unit_id);
 
         $totalReceived = $this->received + $quantity;
         $status        = static::STATUS_PENDING;
@@ -111,15 +111,12 @@ class PurchaseOrderContent extends Model {
     }
 
     public function updateQuantity($quantity, $warehouseId){
-        $leftToReceive = $quantity - $this->received;
-        $this->update(["quantity" => $quantity, "received" => max($leftToReceive, 0)]);
-        $this->updateStatus();
-        $this->order->updateStatus();
-        $this->adjustExtraItemsOnStock( $leftToReceive, $warehouseId );
-    }
-
-    public function updateStatus() {
-        $this->update(["status" => $this->calculateStatus()]);
+        $leftToReceive      = $quantity - $this->received;
+        $this->quantity     = $quantity;
+        $this->received     = $leftToReceive < 0 ? $quantity : $this->received;
+        $this->status       = $this->calculateStatus();
+        $this->adjustStock($leftToReceive, $warehouseId);
+        $this->save();
     }
 
     public function calculateStatus() {
@@ -130,8 +127,8 @@ class PurchaseOrderContent extends Model {
         return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
     }
 
-    private function adjustExtraItemsOnStock($leftToReceive, $warehouseId) {
+    private function adjustStock($leftToReceive, $warehouseId) {
         if ( $leftToReceive >= 0 ) return;
-        Warehouse::find($warehouseId)->add($this->item()->id, $leftToReceive, $this->vendorItem->unit_id);
+        Warehouse::find($warehouseId)->add($this->vendorItem->item_id, $leftToReceive, $this->vendorItem->unit_id);
     }
 }
