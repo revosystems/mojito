@@ -126,7 +126,7 @@ class PurchaseOrderContent extends Model {
         $leftToReceive  = $this->quantity - $this->received;
         if ( $this->status == PurchaseOrderContent::STATUS_DRAFT )  return PurchaseOrderContent::STATUS_DRAFT;
         else if ($leftToReceive == 0)                               return PurchaseOrderContent::STATUS_RECEIVED;
-        else if ($leftToReceive == $this->quanitity)                return PurchaseOrderContent::STATUS_PENDING;
+        else if ($leftToReceive == $this->quantity)                return PurchaseOrderContent::STATUS_PENDING;
         return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
     }
 
