@@ -69,7 +69,7 @@ class PurchaseOrderContent extends Model {
     //============================================================================
     public function receive($quantity, $warehouseId){
         $warehouse  = Warehouse::find($warehouseId);
-        $warehouse->add($this->item()->id, $quantity, $this->vendorItem->unit_id);
+        $warehouse->add($this->vendorItem->item_id, $quantity, $this->vendorItem->unit_id);
 
         $totalReceived = $this->received + $quantity;
         $status        = static::STATUS_PENDING;
@@ -104,5 +104,31 @@ class PurchaseOrderContent extends Model {
             static::STATUS_RECEIVED             => __('admin.received'),
             static::STATUS_DRAFT                => __('admin.draft'),
         ];
+    }
+
+    public function updatePrice($price) {
+        $this->update(["price" => str_replace(',', '.', $price)]);
+    }
+
+    public function updateQuantity($quantity, $warehouseId){
+        $leftToReceive      = $quantity - $this->received;
+        $this->quantity     = $quantity;
+        $this->received     = $leftToReceive < 0 ? $quantity : $this->received;
+        $this->status       = $this->calculateStatus();
+        $this->adjustStock($leftToReceive, $warehouseId);
+        $this->save();
+    }
+
+    public function calculateStatus() {
+        $leftToReceive  = $this->quantity - $this->received;
+        if ( $this->status == PurchaseOrderContent::STATUS_DRAFT )  return PurchaseOrderContent::STATUS_DRAFT;
+        else if ($leftToReceive == 0)                               return PurchaseOrderContent::STATUS_RECEIVED;
+        else if ($leftToReceive == $this->quantity)                return PurchaseOrderContent::STATUS_PENDING;
+        return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
+    }
+
+    private function adjustStock($leftToReceive, $warehouseId) {
+        if ( $leftToReceive >= 0 ) return;
+        Warehouse::find($warehouseId)->add($this->vendorItem->item_id, $leftToReceive, $this->vendorItem->unit_id);
     }
 }

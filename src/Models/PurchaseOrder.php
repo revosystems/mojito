@@ -21,7 +21,7 @@ class PurchaseOrder extends Model {
     public static function createWith($vendor_id, $items, $status = PurchaseOrderContent::STATUS_PENDING){
         if( ! count($items) ) return null;
 
-        $order = tap(PurchaseOrder::create( compact('vendor_id', 'status') ), function ($order) use ($items) {
+        $order = tap(self::create( compact('vendor_id', 'status') ), function ($order) use ($items) {
             return $order->contents()->createMany(collect($items)->map(function ($item) use ($order) {
                 return (new PurchaseOrderContent([
                     'status'         => $order->status,
@@ -122,7 +122,7 @@ class PurchaseOrder extends Model {
         if ( $this->status == PurchaseOrderContent::STATUS_DRAFT )  return PurchaseOrderContent::STATUS_DRAFT;
         else if ($leftToReceive == 0)                               return PurchaseOrderContent::STATUS_RECEIVED;
         else if ($leftToReceive == $total)                          return PurchaseOrderContent::STATUS_PENDING;
-        else                                                        return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
+        return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
     }
 
     public function statusName(){
