@@ -81,10 +81,7 @@ trait ItemTrait{
     }
 
     public function finalCostPrice(){
-        if($this->hasAssemblies()) {
-            return $this->assemblyPrice();
-        }
-        return $this->costPrice;
+        return $this->hasAssemblies() ? $this->assemblyPrice() : $this->costPrice;
     }
 
     public function hasAssemblies(){
