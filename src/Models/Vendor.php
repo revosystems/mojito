@@ -56,11 +56,9 @@ class Vendor extends Model {
     public function automaticPurchaseOrder($belowAlert = true){
         $toReturn = [];
         foreach($this->items as $item){
-
             $totalQty       = 0;
             $totalDefault   = 0;
             $totalAlert     = 0;
-
             foreach($item->warehouses as $warehouse){
                 $totalQty     += $warehouse->pivot->quantity;
                 $totalDefault += $warehouse->pivot->defaultQuantity;
@@ -87,7 +85,6 @@ class Vendor extends Model {
                 "pack"      => $item->pivot->pack,
                 "unit"      => Unit::find($item->pivot->unit_id)->name,
             ];
-
         }
         return $toReturn;
     }
