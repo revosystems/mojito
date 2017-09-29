@@ -57,11 +57,11 @@ class PurchaseOrderContent extends Model {
     // JSON APPENDS
     //============================================================================
     public function getItemNameAttribute(){
-        return $this->vendorItem->item->name;
+        return $this->vendorItem->item->name ?? "";
     }
 
     public function getItemBarcodeAttribute(){
-        return $this->vendorItem->item->barcode;
+        return $this->vendorItem->item->barcode ? "";
     }
 
     //============================================================================
