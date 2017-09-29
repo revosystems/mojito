@@ -91,6 +91,11 @@ trait ItemTrait
             return $assembly->costPrice * $finalQty;
         });
     }
+    
+    public function finalCostPrice()
+    {
+        return $this->hasAssemblies() ? $this->assemblyPrice() : $this->costPrice;
+    }
 
     public function hasAssemblies()
     {
