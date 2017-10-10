@@ -61,7 +61,7 @@ class PurchaseOrderContent extends Model {
     }
 
     public function getItemBarcodeAttribute(){
-        return $this->vendorItem->item->barcode ? "";
+        return $this->vendorItem->item->barcode ?? "";
     }
 
     //============================================================================
