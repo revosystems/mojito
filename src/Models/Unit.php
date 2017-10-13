@@ -18,6 +18,10 @@ class Unit extends Model{
     const LBS       = 4;
     const GAL       = 5;
 
+    public static function getTableName(){
+        return with(new static)->getTable();
+    }
+
     //====================================================================
     // SCOPES
     //====================================================================
