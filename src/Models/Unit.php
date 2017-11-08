@@ -1,12 +1,13 @@
-<?php namespace BadChoice\Mojito\Models;
+<?php
+
+namespace BadChoice\Mojito\Models;
 
 use BadChoice\Mojito\Exceptions\UnitsNotCompatibleException;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Unit extends Model{
-
+class Unit extends Model
+{
     use SoftDeletes;
 
     protected $table    = "units";
@@ -21,13 +22,15 @@ class Unit extends Model{
     //====================================================================
     // SCOPES
     //====================================================================
-    public function scopeByMainUnit($query,$mainUnit){
-        $query->where('main_unit','=',$mainUnit);
+    public function scopeByMainUnit($query, $mainUnit)
+    {
+        $query->where('main_unit', '=', $mainUnit);
     }
 
-    public static function unitFor($mainUnit,$conversion,$shouldCreate = false){
-        $unit = Unit::where('main_unit','=',$mainUnit)->where('conversion','=',$conversion)->first();
-        if($unit == null && $shouldCreate){
+    public static function unitFor($mainUnit, $conversion, $shouldCreate = false)
+    {
+        $unit = Unit::where('main_unit', '=', $mainUnit)->where('conversion', '=', $conversion)->first();
+        if ($unit == null && $shouldCreate) {
             $unit = Unit::create(['main_unit' => $mainUnit, 'conversion' => $conversion , 'name' => $conversion . ' ' . Unit::getMainUnitName($mainUnit)]);
         }
         return $unit;
@@ -36,34 +39,48 @@ class Unit extends Model{
     //====================================================================
     // METHODS
     //====================================================================
-    public static function convert($qty,$originUnitId,$destinationUnitId){
-        if($originUnitId == null || $destinationUnitId == null) return $qty;    //To keep keep retrofunctionality (can be removed when everybody on >1.9)
-        $originUnit         = static::find($originUnitId);
-        $destinationUnit    = static::find($destinationUnitId);
+    public static function convert($qty, $origin, $destination)
+    {
+        if ($origin == null || $destination == null) {
+            return $qty;
+        }
+        $origin         = is_numeric($origin) ? static::find($origin) : $origin;
+        $destination    = is_numeric($destination) ? static::find($destination) : $destination;
 
-        if (! static::areCompatible($originUnit, $destinationUnit) ){
+        if (! static::areCompatible($origin, $destination)) {
             throw new UnitsNotCompatibleException;
         }
 
-        $originMainQty = $qty           * $originUnit     ->conversion;
-        $finalQty      = $originMainQty / $destinationUnit->conversion;
+        $originMainQty = $qty * $origin     ->conversion;
+        $finalQty      = $originMainQty / $destination->conversion;
 
         return $finalQty;
     }
 
-    public static function areCompatible($origin, $destination){
+    public function isCompatibleWith($destinationUnit)
+    {
+        return static::areCompatible($this, $destinationUnit);
+    }
+
+    public static function areCompatible($origin, $destination)
+    {
+        $origin         = is_numeric($origin) ? static::find($origin) : $origin;
+        $destination    = is_numeric($destination) ? static::find($destination) : $destination;
         return $origin->main_unit == $destination->main_unit;
     }
 
-    public function convertToMainUnit($qty){
+    public function convertToMainUnit($qty)
+    {
         return $qty * $this->conversion;
     }
 
-    public function mainUnitName(){
+    public function mainUnitName()
+    {
         return static::getMainUnitName($this->main_unit);
     }
 
-    public static function getMainUnits(){
+    public static function getMainUnits()
+    {
         return [
             static::STANDARD    => static::getMainUnitName(static::STANDARD),
             static::KG          => static::getMainUnitName(static::KG),
@@ -73,11 +90,18 @@ class Unit extends Model{
         ];
     }
 
-    public static function getMainUnitName($mainUnit){
-        if      ($mainUnit == static::STANDARD) return trans_choice("admin.unit", 1);
-        else if ($mainUnit == static::KG)       return "KG";
-        else if ($mainUnit == static::L)        return "L";
-        else if ($mainUnit == static::LBS)      return "LBS";
-        else if ($mainUnit == static::GAL)      return "GAL";
+    public static function getMainUnitName($mainUnit)
+    {
+        if ($mainUnit == static::STANDARD) {
+            return trans_choice("admin.unit", 1);
+        } elseif ($mainUnit == static::KG) {
+            return "KG";
+        } elseif ($mainUnit == static::L) {
+            return "L";
+        } elseif ($mainUnit == static::LBS) {
+            return "LBS";
+        } elseif ($mainUnit == static::GAL) {
+            return "GAL";
+        }
     }
 }
