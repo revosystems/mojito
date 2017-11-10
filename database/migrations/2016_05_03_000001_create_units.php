@@ -34,7 +34,6 @@ class CreateUnits extends Migration
             ['name' => Unit::getMainUnitName(Unit::GAL),        'main_unit' => Unit::GAL,       'conversion' => 1],
             ['name' => 'g',                                     'main_unit' => Unit::KG,        'conversion' => 0.001],
             ['name' => 'cl',                                    'main_unit' => Unit::L,         'conversion' => 0.010],
-            ['name' => 'Can 33 cl',                             'main_unit' => Unit::L,         'conversion' => 0.33],
         ]);
     }
 
