@@ -12,6 +12,10 @@ class Assembly extends Pivot {
         $this->table = config('mojito.assembliesTable');
     }
 
+    public static function getTableName(){
+        return with(new static)->getTable();
+    }
+
     //*** Scopes don't work this way? **///
     /*public function __construct(Model $parent, $attributes, $table, $exists = false){
         parent::__construct($parent, $attributes, $table, $exists);
