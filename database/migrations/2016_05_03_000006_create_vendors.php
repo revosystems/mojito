@@ -36,9 +36,9 @@ class CreateVendors extends Migration
         {
             $table->increments('id');
 
-            $table->string  ('reference');
+            $table->string  ('reference')->nullable();
             $table->integer ('pack');
-            $table->decimal ('costPrice');
+            $table->decimal ('costPrice')->nullable();
 
             $table->integer ('unit_id')->unsigned()->default(1);
             $table->foreign ('unit_id')->references('id')->on('units')->onDelete('cascade');
