@@ -87,7 +87,7 @@ trait ItemTrait
     public function assemblyPrice()
     {
         return $this->assemblies->sum(function ($assembly) {
-            $finalQty = Unit::convert($assembly->pivot->quantity, $assembly->pivot->unit_id, $assembly->unit_id);
+            $finalQty = Unit::convert($assembly->pivot->quantity, $assembly->pivot->unit, $assembly->unit);
             return $assembly->costPrice * $finalQty;
         });
     }
