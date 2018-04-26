@@ -1,9 +1,12 @@
-<?php namespace BadChoice\Mojito\Models;
+<?php
+
+namespace BadChoice\Mojito\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Vendor extends Model {
+class Vendor extends Model
+{
     use SoftDeletes;
     protected $table        = "vendors";
     protected $hidden       = ['created_at','updated_at','deleted_at'];
@@ -21,12 +24,12 @@ class Vendor extends Model {
         'email'         => 'email',
     ];
 
-
     //============================================================================
     // PARENT FUNCTIONS
     //============================================================================
-    public static function canBeDeleted($id){
-        if(count(Vendor::find($id)->orders) > 0) {
+    public static function canBeDeleted($id)
+    {
+        if (count(Vendor::find($id)->orders) > 0) {
             throw new \Exception("Vendor has orders");
         }
         return true;
@@ -35,47 +38,51 @@ class Vendor extends Model {
     //============================================================================
     // RELATIONSHIPS
     //============================================================================
-    public function items(){
-        return $this->belongsToMany(config('mojito.itemClass','Item'),config('mojito.vendorItemsTable'),'vendor_id','item_id')->withPivot('id','costPrice','unit_id','reference','tax_id','pack')->wherePivot('deleted_at','=',null);
+    public function items()
+    {
+        return $this->belongsToMany(config('mojito.itemClass', 'Item'), config('mojito.vendorItemsTable'), 'vendor_id', 'item_id')->withPivot('id', 'costPrice', 'unit_id', 'reference', 'tax_id', 'pack')->wherePivot('deleted_at', '=', null);
     }
 
-    public function orders(){
+    public function orders()
+    {
         return $this->hasMany('BadChoice\Mojito\Models\PurchaseOrder');
     }
 
     //============================================================================
     // MEHTODS
     //============================================================================
-    public function addItem($item_id,$unit_id){
-        $this->items()->attach($item_id,[
+    public function addItem($item_id, $unit_id)
+    {
+        $this->items()->attach($item_id, [
             "unit_id" => $unit_id,
             "pack"    => 1,
         ]);
     }
 
-    public function automaticPurchaseOrder($belowAlert = true){
+    public function automaticPurchaseOrder($belowAlert = true)
+    {
         $toReturn = [];
-        foreach($this->items as $item){
+        foreach ($this->items as $item) {
             $totalQty       = 0;
             $totalDefault   = 0;
             $totalAlert     = 0;
-            foreach($item->warehouses as $warehouse){
-                $totalQty     += $warehouse->pivot->quantity;
+            foreach ($item->warehouses as $warehouse) {
+                $totalQty += $warehouse->pivot->quantity;
                 $totalDefault += $warehouse->pivot->defaultQuantity;
-                $totalAlert   += $warehouse->pivot->alert;
+                $totalAlert += $warehouse->pivot->alert;
             }
 
             $toRefill = $totalDefault - $totalQty;
 
-            if($toRefill <= 0 || $totalDefault == 0) {
+            if ($toRefill <= 0 || $totalDefault == 0) {
                 continue;
             }
 
-            if( ! $belowAlert && $totalQty > $totalAlert ){
+            if (! $belowAlert && $totalQty > $totalAlert) {
                 continue;
             }
 
-            $toRefill = $item->pivot->pack*ceil($toRefill/$item->pivot->pack);  //Minium pack size
+            $toRefill = $item->pivot->pack * ceil($toRefill / $item->pivot->pack);  //Minium pack size
 
             $toReturn[$item->id] = [
                 "name"      => $item->name,
@@ -89,8 +96,9 @@ class Vendor extends Model {
         return $toReturn;
     }
 
-    public function delete(){
-        foreach (VendorItemPivot::byVendor($this->id)->get() as $object){
+    public function delete()
+    {
+        foreach (VendorItemPivot::byVendor($this->id)->get() as $object) {
             $object->delete();
         }
         return parent::delete();

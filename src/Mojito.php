@@ -1,12 +1,18 @@
-<?php namespace BadChoice\Mojito;
+<?php
 
-class Mojito{
+namespace BadChoice\Mojito;
+
+class Mojito
+{
     public $warehouse;
 
-    public function setWarehouse($warehouse){
+    public function setWarehouse($warehouse)
+    {
         $this->warehouse = $warehouse;
     }
-    public function getWarehouse(){
+
+    public function getWarehouse()
+    {
         return $this->warehouse;
     }
 }

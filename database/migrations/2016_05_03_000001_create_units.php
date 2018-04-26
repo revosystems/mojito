@@ -14,12 +14,12 @@ class CreateUnits extends Migration
      */
     public function up()
     {
-        Schema::create('units', function(Blueprint $table){
+        Schema::create('units', function (Blueprint $table) {
             $table->increments('id');
 
             $table->string('name');
             $table->integer('main_unit')->unsigned();
-            $table->decimal('conversion',8,3)->default(1);
+            $table->decimal('conversion', 8, 3)->default(1);
 
             $table->timestamps();
             $table->softDeletes();

@@ -1,4 +1,6 @@
-<?php namespace BadChoice\Mojito;
+<?php
+
+namespace BadChoice\Mojito;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -26,7 +28,6 @@ class MojitoServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../config/mojito.php' => config_path('mojito.php'),
         ], 'config');
-
     }
 
     /**

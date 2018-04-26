@@ -12,7 +12,7 @@ class AddItemFields extends Migration
      */
     public function up()
     {
-        Schema::table(config('mojito.itemsTable'),function(Blueprint $table){
+        Schema::table(config('mojito.itemsTable'), function (Blueprint $table) {
             $table->boolean('usesStockManagement')  ->default(0);
             $table->boolean('usesWeight')           ->default(0);
 
@@ -28,7 +28,7 @@ class AddItemFields extends Migration
      */
     public function down()
     {
-        Schema::table(config('mojito.itemsTable'),function(Blueprint $table){
+        Schema::table(config('mojito.itemsTable'), function (Blueprint $table) {
             $table->dropColumn('usesStockManagement');
             $table->dropColumn('usesWeight');
 
