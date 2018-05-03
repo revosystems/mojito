@@ -112,7 +112,7 @@ class PurchaseOrder extends Model {
 
     public function calculateTax(){
         return $this->contents->sum(function ($content) {
-            return $content->price * $content->quantity * $content->item()->taxToUse()->percentage / 100;
+            return $content->price * $content->quantity * $content->item->taxToUse()->percentage / 100;
         });
     }
 
