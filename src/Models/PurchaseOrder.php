@@ -127,6 +127,12 @@ class PurchaseOrder extends Model
         });
     }
 
+    public function calculateTax(){
+        return $this->contents->sum(function ($content) {
+            return $content->price * $content->quantity * $content->item->taxToUse()->percentage / 100;
+        });
+    }
+
     /**
      * Called for purchaseOrderContent, when it is updated, it updates the orderStatus
      * @return int
