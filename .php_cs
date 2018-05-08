@@ -24,8 +24,7 @@ $excludes = [
     // add exclude project directory
     'vendor',
     'node_modules',
-    'bootstrap',
-    'storage'
+    'bootstrap'
 ];
 return PhpCsFixer\Config::create()
     ->setRiskyAllowed(false)
