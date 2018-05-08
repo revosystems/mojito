@@ -1,11 +1,14 @@
-<?php namespace BadChoice\Mojito\Models;
+<?php
+
+namespace BadChoice\Mojito\Models;
 
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
-class Warehouse extends Model {
+class Warehouse extends Model
+{
     use SoftDeletes;
 
     protected $table        = "warehouses";
@@ -24,40 +27,50 @@ class Warehouse extends Model {
     //============================================================================
     // RELATIONSHIPS
     //============================================================================
-    public function stocks(){
-        return $this->hasMany(config('mojito.stockClass'),'warehouse_id');
+    public function stocks()
+    {
+        return $this->hasMany(config('mojito.stockClass'), 'warehouse_id');
     }
 
-    public function stockByItem($menuItem){
-        $stockClass = config('mojito.stockClass','Stock');
-        return $stockClass ::where('warehouse_id','=',$this->id)->where('item_id','=',$menuItem->id)->first();
+    public function stockByItem($menuItem)
+    {
+        $stockClass = config('mojito.stockClass', 'Stock');
+        return $stockClass ::where('warehouse_id', '=', $this->id)->where('item_id', '=', $menuItem->id)->first();
     }
 
-    public function stocksToRefill(){
-        return $this->hasMany(config('mojito.stockClass'),'warehouse_id')->where('defaultQuantity','>',DB::raw('quantity'));
+    public function stocksToRefill()
+    {
+        return $this->hasMany(config('mojito.stockClass'), 'warehouse_id')->where('defaultQuantity', '>', DB::raw('quantity'));
     }
 
     //============================================================================
     // METHODS
     //============================================================================
-    public static function canBeDeleted($id){
-        $stockClass = config('mojito.stockClass','Stock');
-        if(count($stockClass::byWarehouse($id)->get()) > 0 ){
+    public static function canBeDeleted($id)
+    {
+        $stockClass = config('mojito.stockClass', 'Stock');
+        if (count($stockClass::byWarehouse($id)->get()) > 0) {
             throw new Exception(trans('admin.notEmpty'));
         }
         return true;
     }
 
-    public static function actionName($action){
-        if($action == Warehouse::ACTION_ADD)            return trans('admin.add');
-        if($action == Warehouse::ACTION_MOVE)           return trans('admin.move');
-        if($action == Warehouse::ACTION_SET_INVENTORY)  return trans('admin.setInventory');
+    public static function actionName($action)
+    {
+        if ($action == Warehouse::ACTION_ADD) {
+            return trans('admin.add');
+        }
+        if ($action == Warehouse::ACTION_MOVE) {
+            return trans('admin.move');
+        }
+        if ($action == Warehouse::ACTION_SET_INVENTORY) {
+            return trans('admin.setInventory');
+        }
     }
-
 
     public function delete()
     {
-        $stockClass = config('mojito.stockClass','Stock');
+        $stockClass = config('mojito.stockClass', 'Stock');
         foreach ($stockClass::byWarehouse($this->id)->get() as $object) {
             $object->delete();
         }
@@ -72,16 +85,15 @@ class Warehouse extends Model {
      * @param $unit_id to to the conversion
      * @return bool if can be added
      */
-    public function add($itemId, $qty, $unit_id = null){
+    public function add($itemId, $qty, $unit_id = null)
+    {
+        $stockClass = config('mojito.stockClass', 'Stock');
+        $pivot      = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $itemId)->first();
 
-        $stockClass = config('mojito.stockClass','Stock');
-        $pivot      = $stockClass::where('warehouse_id','=',$this->id)->where('item_id','=',$itemId)->first();
-
-        if($pivot == null){
+        if ($pivot == null) {
             $this->setInventory($itemId, $qty, $unit_id);
-        }
-        else{
-            $qty    = Unit::convert($qty,$unit_id,$pivot->unit_id);
+        } else {
+            $qty    = Unit::convert($qty, $unit_id, $pivot->unit_id);
             $pivot->update(["quantity" => $pivot->quantity + $qty]);
             StockMovement::create([
                 'item_id'           => $itemId,
@@ -102,18 +114,23 @@ class Warehouse extends Model {
      * @param $toWarehouseId the warehouse we want to move to
      * @param $qty the quantity we are moving
      */
-    public function move($itemId,$toWarehouseId,$qty){
+    public function move($itemId, $toWarehouseId, $qty)
+    {
+        $stockClass = config('mojito.stockClass', 'Stock');
+        $pivotFrom  = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $itemId)->first();
+        if ($pivotFrom == null) {
+            return false;
+        }
 
-        $stockClass = config('mojito.stockClass','Stock');
-        $pivotFrom = $stockClass::where('warehouse_id','=',$this->id)->where('item_id','=',$itemId)->first();
-        if($pivotFrom == null) return false;
+        $pivotTo = $stockClass::where('warehouse_id', '=', $toWarehouseId)->where('item_id', '=', $itemId)->first();
 
-        $pivotTo = $stockClass::where('warehouse_id','=',$toWarehouseId)->where('item_id','=',$itemId)->first();
+        if ($pivotTo != null) {
+            $destQty = Unit::convert($qty, $pivotFrom->unit_id, $pivotTo->unit_id);
+        } else {
+            $destQty = $qty;
+        }
 
-        if($pivotTo != null){ $destQty = Unit::convert($qty, $pivotFrom->unit_id, $pivotTo->unit_id);       }
-        else                { $destQty = $qty;                                                              }
-
-        if($pivotTo == null){
+        if ($pivotTo == null) {
             $stockClass::create([
                 'warehouse_id' => $toWarehouseId,
                 'item_id'      => $itemId,
@@ -121,8 +138,7 @@ class Warehouse extends Model {
                 'unit_id'      => $pivotFrom->unit_id,
                 'alert'        => 0,
             ]);
-        }
-        else{
+        } else {
             $pivotTo->update(["quantity" => $pivotTo->quantity + $destQty]);
         }
         $pivotFrom->update(["quantity" => $pivotFrom->quantity - $qty]);
@@ -147,14 +163,15 @@ class Warehouse extends Model {
      * @param $unit_id to to the conversion
      * @return bool
      */
-    public function setInventory($itemId, $qty, $unit_id = null){
-        $stockClass = config('mojito.stockClass','Stock');
-        $pivot      = $stockClass::where('warehouse_id','=',$this->id)->where('item_id','=',$itemId)->first();
+    public function setInventory($itemId, $qty, $unit_id = null)
+    {
+        $stockClass = config('mojito.stockClass', 'Stock');
+        $pivot      = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $itemId)->first();
         $result     = false;
 
-        if($pivot == null){
-            if($unit_id == null) {
-                $itemClass = config('mojito.itemClass','Item');
+        if ($pivot == null) {
+            if ($unit_id == null) {
+                $itemClass = config('mojito.itemClass', 'Item');
                 $unit_id   = $itemClass::find($itemId)->unit_id;
             }
             $stockClass::create([
@@ -165,8 +182,7 @@ class Warehouse extends Model {
                 'unit_id'      => $unit_id
             ]);
             $result = true;
-        }
-        else{
+        } else {
             $pivot->update(["quantity" => $qty]);
         }
 
