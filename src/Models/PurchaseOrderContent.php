@@ -102,18 +102,7 @@ class PurchaseOrderContent extends Model
 
     public static function getStatusName($status)
     {
-        if ($status == static::STATUS_PENDING) {
-            return __('admin.pending');
-        } elseif ($status == static::STATUS_SENT) {
-            return __('admin.sent');
-        } elseif ($status == static::STATUS_PARTIAL_RECEIVED) {
-            return __('admin.partialReceived');
-        } elseif ($status == static::STATUS_RECEIVED) {
-            return __('admin.received');
-        } elseif ($status == static::STATUS_DRAFT) {
-            return __('admin.draft');
-        }
-        return "?";
+        return static::statusArray()[$status] ?? '?';
     }
 
     public static function statusArray()
