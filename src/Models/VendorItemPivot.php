@@ -63,4 +63,9 @@ class VendorItemPivot extends Model
     {
         return $this->belongsTo('BadChoice\Mojito\Models\Unit', 'unit_id');
     }
+
+    public function tax()
+    {
+        return $this->belongsTo(config('mojito.taxClass', 'Tax'), 'tax_id');
+    }
 }

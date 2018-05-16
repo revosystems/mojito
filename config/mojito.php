@@ -5,6 +5,7 @@ return [
     "warehouseClass"    => "\\Warehouse",
     "stockClass"        => "\\Stock",
     "employeeClass"     => "\\TenantUser",
+    "taxClass"       	=> "\\Tax",
 
     "stocksTable"       => "stocks",
     "assembliesTable"   => "assemblies",
