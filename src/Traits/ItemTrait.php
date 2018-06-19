@@ -45,6 +45,11 @@ trait ItemTrait
         return $this->hasMany(config('mojito.stockClass'), 'item_id');
     }
 
+    public function inventories()
+    {
+        return $this->hasMany(config('mojito.inventoryContentClass'), 'item_id');
+    }
+
     public function unit()
     {
         return $this->belongsTo(Unit::class);
