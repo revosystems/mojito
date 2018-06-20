@@ -1,12 +1,20 @@
 <?php
 
-namespace BadChoice\Mojito\Traits;
+namespace BadChoice\Mojito\Models;
 
 use BadChoice\Grog\Traits\SaveNestedTrait;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-trait InventoryTrait
+class Inventory extends Model
 {
+    const STATUS_OPENED     = 1;
+    const STATUS_PENDING    = 2;
+    const STATUS_APPROVED   = 3;
+    const STATUS_DENIED     = 4;
+
+    protected $guarded = [];
+
     use SoftDeletes;
     use SaveNestedTrait;
 

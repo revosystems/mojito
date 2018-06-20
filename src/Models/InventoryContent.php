@@ -1,12 +1,16 @@
 <?php
 
-namespace BadChoice\Mojito\Traits;
+namespace BadChoice\Mojito\Models;
 
 use BadChoice\Grog\Traits\SaveNestedTrait;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-trait InventoryContentTrait
+class InventoryContent extends Model
 {
+    protected $guarded  = [];
+    protected $appends  = ["variance", "consumptionCost"];
+
     use SoftDeletes;
     use SaveNestedTrait;
 
