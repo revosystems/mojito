@@ -18,6 +18,9 @@ class CreateInventoriesTables extends Migration
             $table->dateTime('closed_at')->nullable();
             $table->tinyInteger('status')->unsigned()->default(1);
 
+            $table->integer('employee_id')->unsigned();
+            $table->foreign('employee_id')->references('id')->on(config('mojito.employeesTable'))->onDelete('cascade');
+
             $table->integer('warehouse_id')->unsigned();
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
 
@@ -35,7 +38,6 @@ class CreateInventoriesTables extends Migration
             $table->decimal("stockCost", 8, 3)->default(0);
             $table->decimal("surplusDeficitCost", 8, 3)->default(0);    // TODO: Ask for it   stockCost/stock*variance
             $table->decimal("maxRetailPrice", 8, 3)->default(0);        // TODO: Ask for it
-            $table->decimal("stockConsumed", 8, 3)->default(0);
 //            $table->decimal("stockIn", 8, 3);             // TODO: Ask for it
 //            $table->decimal("stockUsageEPOS", 8, 3);      // TODO: Ask for it
 //            $table->decimal("salesRetailGross", 8, 3);    // TODO: Ask for it
@@ -43,7 +45,7 @@ class CreateInventoriesTables extends Migration
 //            $table->decimal("EstDaysStock", 8, 3);        // TODO: Ask for it
 
             $table->integer('item_id')->unsigned();
-            $table->foreign('item_id')->references('id')->on('menu_items')->onDelete('cascade');
+            $table->foreign('item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');
 
             $table->integer('unit_id')->unsigned()->default(1);
             $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');

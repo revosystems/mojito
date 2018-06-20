@@ -32,4 +32,22 @@ class Inventory extends Model
     {
         return $query->where('status', static::STATUS_APPROVED);
     }
+
+    public function updateStatus($status)
+    {
+        if ($this->status == static::STATUS_APPROVED || $this->status == static::STATUS_DENIED){
+            return;
+        }
+        if ($status == static::STATUS_APPROVED) {
+            $this->approve();
+        }
+        $this->status = $status;
+    }
+    
+    public function approve()
+    {
+        $this->contents()->each(function (InventoryContent $content) {
+            $content->approve();
+        });
+    }
 }
