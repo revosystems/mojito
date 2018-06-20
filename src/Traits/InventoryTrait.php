@@ -24,17 +24,4 @@ trait InventoryTrait
     {
         return $query->where('status', static::STATUS_APPROVED);
     }
-
-    /*
-    public function addContent($itemId, $quantity, $unitId = 1)
-    {
-        $this->contents()->updateOrCreate([
-            "item_id"               => $itemId,
-        ], [
-            "real_quantity"         => $quantity,
-            "expected_quantity"  => $this->warehouse->stocks()->where("item_id", $itemId)->sum('quantity'),  // Should be add here or on inventory close?
-            "unit_id"               => $unitId,
-        ]);
-    }
-    */
 }
