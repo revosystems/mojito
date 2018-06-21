@@ -30,20 +30,20 @@ class CreateInventoriesTables extends Migration
 
         Schema::create('inventory_contents', function (Blueprint $table) {
             $table->increments('id');
-            $table->decimal('stock', 8, 3);
-            $table->decimal("previousManagerStock", 8, 3)->default(0);
-            $table->decimal('expectedStock', 8, 3)->nullable();
-            $table->string("itemName", 8, 3)->default("");
-            $table->decimal("previousAuditStock", 8, 3)->default(0);   // TODO: Ask for it
+            $table->decimal('quantity', 8, 3);
+            $table->decimal('expectedQuantity', 8, 3)->nullable();
+            $table->decimal("previousQuantity", 8, 3)->default(0);
             $table->decimal("stockCost", 8, 3)->default(0);
-            $table->decimal("surplusDeficitCost", 8, 3)->default(0);    // TODO: Ask for it   stockCost/stock*variance
-            $table->decimal("maxRetailPrice", 8, 3)->default(0);        // TODO: Ask for it
-//            $table->decimal("stockIn", 8, 3);             // TODO: Ask for it
-//            $table->decimal("stockUsageEPOS", 8, 3);      // TODO: Ask for it
-//            $table->decimal("salesRetailGross", 8, 3);    // TODO: Ask for it
-//            $table->decimal("GPPercent", 8, 3);           // TODO: Ask for it
-//            $table->decimal("EstDaysStock", 8, 3);        // TODO: Ask for it
+            $table->decimal("variance", 8, 3)->default(0);
+            $table->decimal("stockDeficitCost", 8, 3)->default(0);
+            $table->decimal("consumedSinceLastInventory", 8, 3)->default(0);
+            $table->decimal("consumptionCost", 8, 3)->default(0);
+            $table->decimal("stockIn", 8, 3)->default(0);
 
+//            $table->decimal("stockUsageEPOS", 8, 3);              // TODO: Ask for it
+//            $table->decimal("GPPercent", 8, 3);                   // TODO: Ask for it
+
+            $table->integer('item_id')->unsigned();
             $table->integer('item_id')->unsigned();
             $table->foreign('item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');
 

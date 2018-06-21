@@ -3,8 +3,11 @@
 namespace BadChoice\Mojito\Models;
 
 use BadChoice\Grog\Traits\SaveNestedTrait;
+use BadChoice\Mojito\Exceptions\AlreadyApprovedException;
+use BadChoice\Mojito\Exceptions\AlreadyDeniedException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Mockery\Exception;
 
 class Inventory extends Model
 {
@@ -33,21 +36,22 @@ class Inventory extends Model
         return $query->where('status', static::STATUS_APPROVED);
     }
 
-    public function updateStatus($status)
-    {
-        if ($this->status == static::STATUS_APPROVED || $this->status == static::STATUS_DENIED){
-            return;
-        }
-        if ($status == static::STATUS_APPROVED) {
-            $this->approve();
-        }
-        $this->status = $status;
-    }
-    
     public function approve()
     {
-        $this->contents()->each(function (InventoryContent $content) {
-            $content->approve();
-        });
+        if ($this->status == static::STATUS_APPROVED) {
+            throw new AlreadyApprovedException;
+        }
+        $this->contents->each->approve();
+    }
+
+    public function deny()
+    {
+        if ($this->status == static::STATUS_APPROVED) {
+            throw new AlreadyApprovedException;
+        }
+        if ($this->status == static::STATUS_DENIED) {
+            throw new AlreadyDeniedException();
+        }
+        $this->contents->each->approve();
     }
 }
