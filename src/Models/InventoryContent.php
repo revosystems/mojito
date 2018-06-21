@@ -44,18 +44,16 @@ class InventoryContent extends Model
         $this->previousQuantity     = $lastInventory ? $lastInventory->contents()->where('item_id', $this->item_id)->first()->quantity ?? 0 : 0;
         $this->stockCost            = $this->item->costPrice * $this->quantity;
 
-        $stockClass                       = config('mojito.stockClass');
-        $this->expectedQuantity           = $stockClass::findWith($this->item_id, $this->inventory->warehouse_id)->quantity ?? 0;
-        $this->variance                   = $this->quantity - $this->expectedQuantity;
-        $this->stockDeficitCost           = $this->stockCost / $this->quantity * $this->variance;
-        // TODO : es la sum dels stock movements x el magatzem on la qty < 0 des de l'ultim inventari amb aquest producte, type add. * les unitats
-        $this->consumedSinceLastInventory = 0;
+        $stockClass                 = config('mojito.stockClass');
+        $this->expectedQuantity     = $stockClass::findWith($this->item_id, $this->inventory->warehouse_id)->quantity ?? 0;
+        $this->variance             = $this->quantity - $this->expectedQuantity;
+        $this->stockDeficitCost     = $this->stockCost / $this->quantity * $this->variance;
 
+        $this->consumedSinceLastInventory = $this->getQuantityConsumedSinceLastInventory($lastInventory->closed_at ?? null);
         $this->consumptionCost            = $this->stockCost / $this->quantity * $this->consumedSinceLastInventory;
-        // TODO: es la sum dels stock movements x el magatzem on la qty > 0 des de l'ultim inventari amb aquest producte, type add qty < 0 || type move toWarehouse == stockMovement->warehouse. * les unitats
-        $this->stockIn                    = 0;
-        // TODO: be careful 0 division
-        $this->estimatedDaysLeft          = 0;  // $lastInventory ? $this->quantity / ($this->consumedSinceLastInventory / (Carbon::parse($this->inventory->closed_at)->diff(Carbon::parse($lastInventory->closed_at))->days)) : 0;
+
+        $this->stockIn              = $this->getStockInSinceLastInventory($lastInventory->closed_at ?? null);
+        $this->estimatedDaysLeft    = $this->getEstimatedDaysLeft($lastInventory->closed_at ?? null);
         $this->save();
     }
 
@@ -75,5 +73,36 @@ class InventoryContent extends Model
             $this->lastInventory = $inventoryClass::approved()->where("warehouse_id", $this->inventory->warehouse_id)->orderBy('updated_at', 'desc')->first();
         }
         return $this->lastInventory;
+    }
+
+    protected function getQuantityConsumedSinceLastInventory($lastInventoryClosedAt)
+    {
+        return StockMovement::where("to_warehouse_id", $this->inventory->warehouse_id)
+            ->where('item_id', $this->item_id)
+            ->where("action", Warehouse::ACTION_ADD)
+            ->where("quantity", "<", 0)
+            ->whereBetween("created_at", [$lastInventoryClosedAt, $this->inventory->closed_at])
+            ->sum('quantity');  // TODO: multiple by units?;
+    }
+
+    protected function getStockInSinceLastInventory($lastInventoryClosedAt)
+    {
+        return StockMovement::where("to_warehouse_id", $this->inventory->warehouse_id)
+            ->where('item_id', $this->item_id)
+            ->whereBetween("created_at", [$lastInventoryClosedAt, $this->inventory->closed_at])
+            ->where(function ($query) {
+                $query->where("action", Warehouse::ACTION_ADD)->where("quantity", ">", 0)
+                    ->orWhere(function ($query) {
+                        $query->where("action", Warehouse::ACTION_MOVE)->where("to_warehouse_id", $this->inventory->warehouse_id);
+                    });
+            })->sum('quantity');  // TODO: multiple by units?;
+    }
+
+    protected function getEstimatedDaysLeft($lastInventoryClosedAt)
+    {
+        if (! $lastInventoryClosedAt || $this->consumedSinceLastInventory == 0) {
+            return 0;
+        }
+        return intval($this->quantity / ($this->consumedSinceLastInventory / (Carbon::parse($this->inventory->closed_at)->diff(Carbon::parse($lastInventoryClosedAt))->days)));
     }
 }
