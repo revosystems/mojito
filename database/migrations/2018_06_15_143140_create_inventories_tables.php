@@ -39,6 +39,7 @@ class CreateInventoriesTables extends Migration
             $table->decimal("consumedSinceLastInventory", 8, 3)->default(0);
             $table->decimal("consumptionCost", 8, 3)->default(0);
             $table->decimal("stockIn", 8, 3)->default(0);
+            $table->decimal("estimatedDaysLeft", 8, 3)->default(0);
 
 //            $table->decimal("stockUsageEPOS", 8, 3);              // TODO: Ask for it
 //            $table->decimal("GPPercent", 8, 3);                   // TODO: Ask for it

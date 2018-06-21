@@ -38,20 +38,23 @@ class Inventory extends Model
 
     public function approve()
     {
-        if ($this->status == static::STATUS_APPROVED) {
-            throw new AlreadyApprovedException;
-        }
+        $this->canUpdateStatus();
         $this->contents->each->approve();
+        $this->update(["status" => static::STATUS_APPROVED]);
     }
 
     public function deny()
     {
+        $this->canUpdateStatus();
+        $this->update(["status" => static::STATUS_DENIED]);
+    }
+
+    protected function canUpdateStatus() {
         if ($this->status == static::STATUS_APPROVED) {
             throw new AlreadyApprovedException;
         }
         if ($this->status == static::STATUS_DENIED) {
             throw new AlreadyDeniedException();
         }
-        $this->contents->each->approve();
     }
 }

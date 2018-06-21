@@ -3,13 +3,14 @@
 namespace BadChoice\Mojito\Models;
 
 use BadChoice\Grog\Traits\SaveNestedTrait;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class InventoryContent extends Model
 {
     protected $guarded  = [];
-    protected $appends  = ["itemName", "estimatedDaysLeft"];
+    protected $appends  = ["itemName"];
     protected $lastInventory;
 
     use SoftDeletes;
@@ -30,11 +31,6 @@ class InventoryContent extends Model
         return nameOrDash($this->item);
     }
 
-    public function getEstimatedDaysLeft()
-    {
-        return $this->quantity / ($this->consumedSinceLastInventory  /  $this->daysSinceLastInventory);
-    }
-
     public function approve()
     {
         $this->calculateFields();
@@ -49,13 +45,17 @@ class InventoryContent extends Model
         $this->stockCost            = $this->item->costPrice * $this->quantity;
 
         $stockClass                       = config('mojito.stockClass');
-        $this->expectedQuantity           = $stockClass::findWith($this->item_id, $this->inventory->warehouse_id)->quantity;
+        $this->expectedQuantity           = $stockClass::findWith($this->item_id, $this->inventory->warehouse_id)->quantity ?? 0;
         $this->variance                   = $this->quantity - $this->expectedQuantity;
         $this->stockDeficitCost           = $this->stockCost / $this->quantity * $this->variance;
-        $this->consumedSinceLastInventory = 0;   // TODO : es la sum dels stock movements x el magatzem on la qty < 0 des de l'ultim inventari amb aquest producte, type add. * les unitats
+        // TODO : es la sum dels stock movements x el magatzem on la qty < 0 des de l'ultim inventari amb aquest producte, type add. * les unitats
+        $this->consumedSinceLastInventory = 0;
+
         $this->consumptionCost            = $this->stockCost / $this->quantity * $this->consumedSinceLastInventory;
-        $this->stockIn                    = 0;   // TODO: es la sum dels stock movements x el magatzem on la qty > 0 des de l'ultim inventari amb aquest producte, type add qty < 0 || type move toWarehouse == stockMovement->warehouse. * les unitats
-        $this->estimatedDaysLeft          = $lastInventory ? $this->quantity / ($this->consumedSinceLastInventory / ($this->closed_at->diff($lastInventory->closed_at)->days)) : 0;
+        // TODO: es la sum dels stock movements x el magatzem on la qty > 0 des de l'ultim inventari amb aquest producte, type add qty < 0 || type move toWarehouse == stockMovement->warehouse. * les unitats
+        $this->stockIn                    = 0;
+        // TODO: be careful 0 division
+        $this->estimatedDaysLeft          = 0;  // $lastInventory ? $this->quantity / ($this->consumedSinceLastInventory / (Carbon::parse($this->inventory->closed_at)->diff(Carbon::parse($lastInventory->closed_at))->days)) : 0;
         $this->save();
     }
 
