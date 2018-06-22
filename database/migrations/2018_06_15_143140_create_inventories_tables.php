@@ -16,10 +16,9 @@ class CreateInventoriesTables extends Migration
         Schema::create('inventories', function (Blueprint $table) {
             $table->increments('id');
             $table->dateTime('closed_at')->nullable();
-            $table->tinyInteger('status')->unsigned()->default(1);
+            $table->tinyInteger('status')->unsigned()->default(\BadChoice\Mojito\Models\Inventory::STATUS_PENDING);
 
             $table->integer('employee_id')->unsigned();
-            $table->foreign('employee_id')->references('id')->on(config('mojito.employeesTable'))->onDelete('cascade');
 
             $table->integer('warehouse_id')->unsigned();
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
@@ -45,7 +44,6 @@ class CreateInventoriesTables extends Migration
 //            $table->decimal("GPPercent", 8, 3);                   // TODO: Ask for it
 
             $table->integer('item_id')->unsigned();
-            $table->integer('item_id')->unsigned();
             $table->foreign('item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');
 
             $table->integer('unit_id')->unsigned()->default(1);
@@ -66,6 +64,7 @@ class CreateInventoriesTables extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('inventory_contents');
         Schema::dropIfExists('inventories');
     }
 }

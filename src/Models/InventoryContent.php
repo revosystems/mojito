@@ -12,6 +12,10 @@ class InventoryContent extends Model
     protected $guarded  = [];
     protected $appends  = ["itemName"];
     protected $lastInventory;
+    private $stockClass;
+    private $stockMovementClass;
+    private $warehouseClass;
+    private $inventoryClass;
 
     use SoftDeletes;
     use SaveNestedTrait;
@@ -39,13 +43,12 @@ class InventoryContent extends Model
 
     protected function calculateFields()
     {
-        $inventoryClass             = config('mojito.inventoryClass');
-        $lastInventory              = $this->getLastInventory($inventoryClass);
+        $this->setClassFields();
+        $lastInventory              = $this->getLastInventory($this->inventoryClass);
         $this->previousQuantity     = $lastInventory ? $lastInventory->contents()->where('item_id', $this->item_id)->first()->quantity ?? 0 : 0;
         $this->stockCost            = $this->item->costPrice * $this->quantity;
 
-        $stockClass                 = config('mojito.stockClass');
-        $this->expectedQuantity     = $stockClass::findWith($this->item_id, $this->inventory->warehouse_id)->quantity ?? 0;
+        $this->expectedQuantity     = $this->stockClass::findWith($this->item_id, $this->inventory->warehouse_id)->quantity ?? 0;
         $this->variance             = $this->quantity - $this->expectedQuantity;
         $this->stockDeficitCost     = $this->stockCost / $this->quantity * $this->variance;
 
@@ -59,8 +62,8 @@ class InventoryContent extends Model
 
     protected function updateStock()
     {
-        $stockClass                 = config('mojito.stockClass');
-        $stock                      = $stockClass::findWith($this->item_id, $this->inventory->warehouse_id);
+        $stockClass = config('mojito.stockClass');
+        $stock     = $stockClass::findWith($this->item_id, $this->inventory->warehouse_id);
         if (! $stock) {
             return $stockClass::create(["warehouse_id" => $this->inventory->warehouse_id, "item_id" => $this->item_id, "quantity" => $this->quantity]);
         }
@@ -70,16 +73,16 @@ class InventoryContent extends Model
     protected function getLastInventory($inventoryClass)
     {
         if (! $this->lastInventory) {
-            $this->lastInventory = $inventoryClass::approved()->where("warehouse_id", $this->inventory->warehouse_id)->orderBy('updated_at', 'desc')->first();
+            $this->lastInventory = $inventoryClass::approved()->where("warehouse_id", $this->inventory->warehouse_id)->orderBy('closed_at', 'desc')->first();
         }
         return $this->lastInventory;
     }
 
     protected function getQuantityConsumedSinceLastInventory($lastInventoryClosedAt)
     {
-        return StockMovement::where("to_warehouse_id", $this->inventory->warehouse_id)
+        return $this->stockMovementClass::where("to_warehouse_id", $this->inventory->warehouse_id)
             ->where('item_id', $this->item_id)
-            ->where("action", Warehouse::ACTION_ADD)
+            ->where("action", $this->warehouseClass::ACTION_ADD)
             ->where("quantity", "<", 0)
             ->whereBetween("created_at", [$lastInventoryClosedAt, $this->inventory->closed_at])
             ->sum('quantity');  // TODO: multiple by units?;
@@ -87,13 +90,13 @@ class InventoryContent extends Model
 
     protected function getStockInSinceLastInventory($lastInventoryClosedAt)
     {
-        return StockMovement::where("to_warehouse_id", $this->inventory->warehouse_id)
+        return $this->stockMovementClass::where("to_warehouse_id", $this->inventory->warehouse_id)
             ->where('item_id', $this->item_id)
             ->whereBetween("created_at", [$lastInventoryClosedAt, $this->inventory->closed_at])
             ->where(function ($query) {
-                $query->where("action", Warehouse::ACTION_ADD)->where("quantity", ">", 0)
+                $query->where("action", $this->warehouseClass::ACTION_ADD)->where("quantity", ">", 0)
                     ->orWhere(function ($query) {
-                        $query->where("action", Warehouse::ACTION_MOVE)->where("to_warehouse_id", $this->inventory->warehouse_id);
+                        $query->where("action", $this->warehouseClass::ACTION_MOVE)->where("to_warehouse_id", $this->inventory->warehouse_id);
                     });
             })->sum('quantity');  // TODO: multiple by units?;
     }
@@ -104,5 +107,13 @@ class InventoryContent extends Model
             return 0;
         }
         return intval($this->quantity / ($this->consumedSinceLastInventory / (Carbon::parse($this->inventory->closed_at)->diff(Carbon::parse($lastInventoryClosedAt))->days)));
+    }
+
+    protected function setClassFields()
+    {
+        $this->stockClass         = config('mojito.stockClass');
+        $this->stockMovementClass = config('mojito.stockMovementClass');
+        $this->warehouseClass     = config('mojito.warehouseClass');
+        $this->inventoryClass     = config('mojito.inventoryClass');
     }
 }

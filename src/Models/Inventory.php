@@ -26,9 +26,29 @@ class Inventory extends Model
         return $this->belongsTo(config('mojito.warehouseClass', 'Warehouse'), 'warehouse_id');
     }
 
+    public function employee()
+    {
+        return $this->belongsTo(config('mojito.employeeClass', 'Employee'), 'employee_id');
+    }
+
     public function contents()
     {
         return $this->hasMany(config('mojito.inventoryContentClass', 'InventoryContent'));
+    }
+
+    public function availableStatus()
+    {
+        return [
+            static::STATUS_OPENED     => __('admin.opened'),
+            static::STATUS_PENDING    => __('admin.pending'),
+            static::STATUS_APPROVED   => __('admin.approved'),
+            static::STATUS_DENIED     => __('admin.denied'),
+        ];
+    }
+
+    public function statusName()
+    {
+        return $this->availableStatus()[$this->status];
     }
 
     public function scopeApproved($query)
