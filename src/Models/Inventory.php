@@ -7,7 +7,6 @@ use BadChoice\Mojito\Exceptions\AlreadyApprovedException;
 use BadChoice\Mojito\Exceptions\AlreadyDeniedException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Mockery\Exception;
 
 class Inventory extends Model
 {
@@ -16,6 +15,7 @@ class Inventory extends Model
     const STATUS_APPROVED   = 3;
     const STATUS_DENIED     = 4;
 
+    protected $dates   = ["closed_at"];
     protected $guarded = [];
 
     use SoftDeletes;
@@ -58,18 +58,19 @@ class Inventory extends Model
 
     public function approve()
     {
-        $this->canUpdateStatus();
+        $this->validateCanUpdateStatus();
         $this->contents->each->approve();
         $this->update(["status" => static::STATUS_APPROVED]);
     }
 
     public function deny()
     {
-        $this->canUpdateStatus();
+        $this->validateCanUpdateStatus();
         $this->update(["status" => static::STATUS_DENIED]);
     }
 
-    protected function canUpdateStatus() {
+    protected function validateCanUpdateStatus()
+    {
         if ($this->status == static::STATUS_APPROVED) {
             throw new AlreadyApprovedException;
         }
