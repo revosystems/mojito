@@ -72,11 +72,10 @@ class InventoryContent extends Model
     protected function getLastInventory()
     {
         if (! $this->lastInventory) {
-            $this->lastInventory = $this->inventoryClass::approved()->with('contents')
-                ->where("warehouse_id", $this->inventory->warehouse_id)
-                ->orderBy('closed_at', 'desc')->get()->first(function ($inventory) {
-                    return $inventory->contents()->where("item_id", $this->item_id)->exists();
-                });
+            $this->lastInventory = $this->inventoryClass::approved()
+                ->where('warehouse_id', $this->inventory->warehouse_id)->whereHas('contents', function($query) {
+                    $query->where('item_id', $this->item_id);
+                })->latest('closed_at')->first();
         }
         return $this->lastInventory;
     }
