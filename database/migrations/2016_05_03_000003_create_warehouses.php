@@ -12,8 +12,7 @@ class CreateWarehouses extends Migration
      */
     public function up()
     {
-        Schema::create('warehouses', function(Blueprint $table)
-        {
+        Schema::create('warehouses', function (Blueprint $table) {
             // auto increment id (primary key)
             $table->increments('id');
             $table->string('name');

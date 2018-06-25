@@ -12,8 +12,7 @@ class CreateVendors extends Migration
      */
     public function up()
     {
-        Schema::create('vendors', function(Blueprint $table)
-        {
+        Schema::create('vendors', function (Blueprint $table) {
             $table->increments('id');
 
             $table->string('name')          ;
@@ -32,30 +31,28 @@ class CreateVendors extends Migration
             $table->softDeletes();
         });
 
-        Schema::create('item_vendor', function(Blueprint $table)
-        {
+        Schema::create('item_vendor', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->string  ('reference')->nullable();
-            $table->integer ('pack');
-            $table->decimal ('costPrice')->nullable();
+            $table->string('reference')->nullable();
+            $table->integer('pack');
+            $table->decimal('costPrice')->nullable();
 
-            $table->integer ('unit_id')->unsigned()->default(1);
-            $table->foreign ('unit_id')->references('id')->on('units')->onDelete('cascade');
+            $table->integer('unit_id')->unsigned()->default(1);
+            $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
 
-            $table->integer ('item_id')->unsigned()->nullable();
-            $table->foreign ('item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');
+            $table->integer('item_id')->unsigned()->nullable();
+            $table->foreign('item_id')->references('id')->on(config('mojito.itemsTable'))->onDelete('cascade');
 
-            $table->integer ('vendor_id')->unsigned()->nullable();
-            $table->foreign ('vendor_id')->references('id')->on('vendors')->onDelete('cascade');
+            $table->integer('vendor_id')->unsigned()->nullable();
+            $table->foreign('vendor_id')->references('id')->on('vendors')->onDelete('cascade');
 
-            $table->integer ('tax_id')->unsigned()->nullable();
-            $table->foreign ('tax_id')->references('id')->on('taxes')->onDelete('set null');
+            $table->integer('tax_id')->unsigned()->nullable();
+            $table->foreign('tax_id')->references('id')->on('taxes')->onDelete('set null');
 
             $table->timestamps();
             $table->softDeletes();
         });
-
     }
 
     /**

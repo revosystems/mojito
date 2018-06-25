@@ -12,12 +12,11 @@ class CreateStocks extends Migration
      */
     public function up()
     {
-        Schema::create('stocks', function(Blueprint $table){
-
+        Schema::create('stocks', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->decimal('quantity',8,3)         ->default(0);
-            $table->decimal('defaultQuantity',8,3)  ->default(0);
+            $table->decimal('quantity', 8, 3)         ->default(0);
+            $table->decimal('defaultQuantity', 8, 3)  ->default(0);
             $table->integer('alert')->default(0);
 
             $table->integer('warehouse_id')->unsigned();
@@ -33,8 +32,7 @@ class CreateStocks extends Migration
             $table->softDeletes();
         });
 
-        Schema::create('stock_movements', function(Blueprint $table)
-        {
+        Schema::create('stock_movements', function (Blueprint $table) {
             $table->increments('id');
 
             $table->integer('item_id')->unsigned();
@@ -46,7 +44,7 @@ class CreateStocks extends Migration
             $table->integer('to_warehouse_id')->unsigned();
             $table->foreign('to_warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
 
-            $table->decimal('quantity',8,3);
+            $table->decimal('quantity', 8, 3);
 
             $table->tinyInteger('action')   ->unsigned()->default(0);
             $table->tinyInteger('source')   ->unsigned()->default(0);
