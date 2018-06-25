@@ -39,17 +39,11 @@ class StockMovement extends Model
 
     public static function getSourceName($source)
     {
-        if ($source == StockMovement::SOURCE_SALE) {
-            return trans('mojito.sale');
-        }
-        if ($source == StockMovement::SOURCE_REVO_STOCKS) {
-            return trans('mojito.revoStocks');
-        }
-        if ($source == StockMovement::SOURCE_PURCHASE) {
-            return trans('mojito.purchase');
-        }
-        if ($source == StockMovement::SOURCE_BACK) {
-            return trans('mojito.back');
-        }
+        return [
+            StockMovement::SOURCE_SALE          => __('mojito.sale'),
+            StockMovement::SOURCE_REVO_STOCKS   => __('mojito.revoStocks'),
+            StockMovement::SOURCE_PURCHASE      => __('mojito.purchase'),
+            StockMovement::SOURCE_BACK          => __('mojito.back')
+        ][$source] ?? '';
     }
 }
