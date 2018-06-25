@@ -4,7 +4,7 @@ namespace BadChoice\Mojito\Models;
 
 use BadChoice\Grog\Traits\SaveNestedTrait;
 use BadChoice\Mojito\Exceptions\AlreadyApprovedException;
-use BadChoice\Mojito\Exceptions\AlreadyDeniedException;
+use BadChoice\Mojito\Exceptions\AlreadyDeclinedException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -13,7 +13,7 @@ class Inventory extends Model
     const STATUS_OPENED     = 1;
     const STATUS_PENDING    = 2;
     const STATUS_APPROVED   = 3;
-    const STATUS_DENIED     = 4;
+    const STATUS_DECLINED   = 4;
 
     protected $dates   = ["closed_at"];
     protected $guarded = [];
@@ -36,13 +36,13 @@ class Inventory extends Model
         return $this->hasMany(config('mojito.inventoryContentClass', 'InventoryContent'));
     }
 
-    public function availableStatus()
+    public static function availableStatus()
     {
         return [
-            static::STATUS_OPENED     => __('admin.opened'),
-            static::STATUS_PENDING    => __('admin.pending'),
-            static::STATUS_APPROVED   => __('admin.approved'),
-            static::STATUS_DENIED     => __('admin.denied'),
+            static::STATUS_OPENED   => __('admin.opened'),
+            static::STATUS_PENDING  => __('admin.pending'),
+            static::STATUS_APPROVED => __('admin.approved'),
+            static::STATUS_DECLINED => __('admin.declined'),
         ];
     }
 
@@ -63,10 +63,10 @@ class Inventory extends Model
         $this->update(["status" => static::STATUS_APPROVED]);
     }
 
-    public function deny()
+    public function decline()
     {
         $this->validateCanUpdateStatus();
-        $this->update(["status" => static::STATUS_DENIED]);
+        $this->update(["status" => static::STATUS_DECLINED]);
     }
 
     protected function validateCanUpdateStatus()
@@ -74,8 +74,8 @@ class Inventory extends Model
         if ($this->status == static::STATUS_APPROVED) {
             throw new AlreadyApprovedException;
         }
-        if ($this->status == static::STATUS_DENIED) {
-            throw new AlreadyDeniedException();
+        if ($this->status == static::STATUS_DECLINED) {
+            throw new AlreadyDeclinedException();
         }
     }
 }
