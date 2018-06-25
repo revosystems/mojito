@@ -24,6 +24,22 @@ class InventoryContent extends Model
         return $this->belongsTo(config('mojito.inventoryClass', 'Inventory'));
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model)
+        {
+            $model->setExpectedQuantity();
+        });
+    }
+
+    public function setExpectedQuantity()
+    {
+        $stockClass             = config('mojito.stockClass', 'Stock');
+        $this->expectedQuantity = $stockClass::findWith($this->item_id, $this->inventory->warehouse_id)->quantity ?? 0;
+        $this->variance         = $this->quantity - $this->expectedQuantity;
+    }
+
     public function item()
     {
         return $this->belongsTo(config('mojito.itemClass', 'Item'));
@@ -47,8 +63,6 @@ class InventoryContent extends Model
         $this->previousQuantity     = $lastInventory ? $lastInventory->contents()->where('item_id', $this->item_id)->first()->quantity ?? 0 : 0;
         $this->stockCost            = $this->item->costPrice * $this->quantity;
 
-        $this->expectedQuantity     = $this->stockClass::findWith($this->item_id, $this->inventory->warehouse_id)->quantity ?? 0;
-        $this->variance             = $this->quantity - $this->expectedQuantity;
         $this->stockDeficitCost     = $this->item->costPrice * $this->variance;
 
         $this->consumedSinceLastInventory = $this->getQuantityConsumedSince($lastInventory->closed_at ?? null);
