@@ -61,13 +61,13 @@ class InventoryContent extends Model
         $lastInventory              = $this->getLastInventory();
         $consumedSinceLastInventory = $this->getQuantityConsumedSince($lastInventory->closed_at ?? null);
         $this->update([
-            "previousQuantity"           => $lastInventory ? $lastInventory->contents()->where('item_id', $this->item_id)->first()->quantity ?? 0 : 0,
-            "stockCost"                  => $this->item->costPrice * $this->quantity,
-            "stockDeficitCost"           => $this->item->costPrice * $this->variance,
-            "consumedSinceLastInventory" => $consumedSinceLastInventory,
-            "consumptionCost"            => $this->item->costPrice * $consumedSinceLastInventory,
-            "stockIn"                    => $this->getStockInSince($lastInventory->closed_at ?? null),
-            "estimatedDaysLeft"          => $this->getEstimatedDaysLeft($lastInventory->closed_at ?? null, $consumedSinceLastInventory),
+            "previousQuantity"              => $lastInventory ? $lastInventory->contents()->where('item_id', $this->item_id)->first()->quantity ?? 0 : 0,
+            "stockCost"                     => $this->item->costPrice * $this->quantity,
+            "stockDeficitCost"              => $this->item->costPrice * $this->variance,
+            "consumedSinceLastInventory"    => $consumedSinceLastInventory,
+            "consumptionCost"               => $this->item->costPrice * $consumedSinceLastInventory,
+            "stockIn"                       => $this->getStockInSince($lastInventory->closed_at ?? null),
+            "estimatedDaysLeft"             => $this->getEstimatedDaysLeft($lastInventory->closed_at ?? null, $consumedSinceLastInventory),
         ]);
     }
 
