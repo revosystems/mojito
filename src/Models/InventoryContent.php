@@ -79,7 +79,7 @@ class InventoryContent extends Model
             "item_id"       => $this->item_id,
             "warehouse_id"  => $this->inventory->warehouse_id,
         ],[
-            "quantity" => $this->quantity,
+            "quantity" => $this->quantity + StockMovement::where("created_at", ">", $this->inventory->closed_at ?? $this->item->created_at)->sum('quantity'),
         ]);
     }
 
