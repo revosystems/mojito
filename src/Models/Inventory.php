@@ -56,6 +56,11 @@ class Inventory extends Model
         return $query->where('status', static::STATUS_APPROVED);
     }
 
+    public function getPreviousApprovedInventory()
+    {
+        return $this->approved()->where('closed_at', "<", $this->closed_at ?: $this->created_at)->latest()->first();
+    }
+
     public function approve()
     {
         $this->validateCanUpdateStatus();

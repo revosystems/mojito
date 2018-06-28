@@ -27,8 +27,7 @@ class InventoryContent extends Model
     protected static function boot()
     {
         parent::boot();
-        static::creating(function ($model)
-        {
+        static::creating(function ($model) {
             $model->setExpectedQuantity();
         });
     }
@@ -60,17 +59,16 @@ class InventoryContent extends Model
     protected function calculateFields()
     {
         $lastInventory              = $this->getLastInventory();
-        $this->previousQuantity     = $lastInventory ? $lastInventory->contents()->where('item_id', $this->item_id)->first()->quantity ?? 0 : 0;
-        $this->stockCost            = $this->item->costPrice * $this->quantity;
-
-        $this->stockDeficitCost     = $this->item->costPrice * $this->variance;
-
-        $this->consumedSinceLastInventory = $this->getQuantityConsumedSince($lastInventory->closed_at ?? null);
-        $this->consumptionCost            = $this->item->costPrice * $this->consumedSinceLastInventory;
-
-        $this->stockIn              = $this->getStockInSince($lastInventory->closed_at ?? null);
-        $this->estimatedDaysLeft    = $this->getEstimatedDaysLeft($lastInventory->closed_at ?? null);
-        $this->save();
+        $consumedSinceLastInventory = $this->getQuantityConsumedSince($lastInventory->closed_at ?? null);
+        $this->update([
+            "previousQuantity"              => $lastInventory ? $lastInventory->contents()->where('item_id', $this->item_id)->first()->quantity ?? 0 : 0,
+            "stockCost"                     => $this->item->costPrice * $this->quantity,
+            "stockDeficitCost"              => $this->item->costPrice * $this->variance,
+            "consumedSinceLastInventory"    => $consumedSinceLastInventory,
+            "consumptionCost"               => $this->item->costPrice * $consumedSinceLastInventory,
+            "stockIn"                       => $this->getStockInSince($lastInventory->closed_at ?? null),
+            "estimatedDaysLeft"             => $this->getEstimatedDaysLeft($lastInventory->closed_at ?? null, $consumedSinceLastInventory),
+        ]);
     }
 
     protected function updateStock()
@@ -78,8 +76,8 @@ class InventoryContent extends Model
         return $this->stockClass::updateOrCreate([
             "item_id"       => $this->item_id,
             "warehouse_id"  => $this->inventory->warehouse_id,
-        ],[
-            "quantity" => $this->quantity,
+        ], [
+            "quantity" => $this->quantity + StockMovement::where("created_at", ">", $this->inventory->closed_at ?? $this->item->created_at)->sum('quantity'),
         ]);
     }
 
@@ -87,7 +85,7 @@ class InventoryContent extends Model
     {
         if (! $this->lastInventory) {
             $this->lastInventory = $this->inventoryClass::approved()
-                ->where('warehouse_id', $this->inventory->warehouse_id)->whereHas('contents', function($query) {
+                ->where('warehouse_id', $this->inventory->warehouse_id)->whereHas('contents', function ($query) {
                     $query->where('item_id', $this->item_id);
                 })->latest('closed_at')->first();
         }
@@ -122,8 +120,8 @@ class InventoryContent extends Model
                 $query->where("action", $this->warehouseClass::ACTION_ADD)
                        ->where("quantity", ">", 0)
                        ->orWhere(function ($query) {
-                            $query->where("action", $this->warehouseClass::ACTION_MOVE)->where("to_warehouse_id", $this->inventory->warehouse_id);
-                        });
+                           $query->where("action", $this->warehouseClass::ACTION_MOVE)->where("to_warehouse_id", $this->inventory->warehouse_id);
+                       });
             })->sum('quantity');  // Since we are working on same warehouse, units are the same and no conversion is required
     }
 
@@ -133,16 +131,16 @@ class InventoryContent extends Model
             ->whereBetween("created_at", [$lastInventoryClosedAt ? : $this->item->created_at, $this->inventory->closed_at]);
     }
 
-    protected function getEstimatedDaysLeft($lastInventoryClosedAt)
+    protected function getEstimatedDaysLeft($lastInventoryClosedAt, $consumedSinceLastInventory)
     {
-        if (! $lastInventoryClosedAt || $this->consumedSinceLastInventory == 0) {
+        if (! $lastInventoryClosedAt || $consumedSinceLastInventory == 0) {
             return 0;
         }
         $diffInDays = $this->inventory->closed_at->diffInDays($lastInventoryClosedAt);
         if (! $diffInDays) {
             return 0;
         }
-        return number_format($this->quantity / ($this->consumedSinceLastInventory / $diffInDays), 2);
+        return number_format($this->quantity / ($consumedSinceLastInventory / $diffInDays), 2);
     }
 
     protected function setClassFields()

@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "badchoice/grog",
-            "version": "1.5.3",
+            "version": "1.5.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BadChoice/grog.git",
-                "reference": "72e69496c9f0a166bbc8ad594889e06f64553e18"
+                "reference": "a74b56e0bfac872be75282f0296af8806738bff9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BadChoice/grog/zipball/72e69496c9f0a166bbc8ad594889e06f64553e18",
-                "reference": "72e69496c9f0a166bbc8ad594889e06f64553e18",
+                "url": "https://api.github.com/repos/BadChoice/grog/zipball/a74b56e0bfac872be75282f0296af8806738bff9",
+                "reference": "a74b56e0bfac872be75282f0296af8806738bff9",
                 "shasum": ""
             },
             "require": {
@@ -40,7 +40,7 @@
                 }
             ],
             "description": "Easy form builder from array",
-            "time": "2018-04-24T09:28:34+00:00"
+            "time": "2018-06-25T10:07:05+00:00"
         },
         {
             "name": "doctrine/inflector",
