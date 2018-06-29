@@ -59,11 +59,13 @@ class InventoryContent extends Model
     protected function calculateFields()
     {
         $lastInventory              = $this->getLastInventory();
-        $consumedSinceLastInventory = $this->getQuantityConsumedSince($lastInventory->closed_at ?? null);
+        $stockConsumedByPOS         = $this->getQuantityConsumedSince($lastInventory->closed_at ?? null);
+        $consumedSinceLastInventory = $stockConsumedByPOS - $this->variance;
         $this->update([
             "previousQuantity"              => $lastInventory ? $lastInventory->contents()->where('item_id', $this->item_id)->first()->quantity ?? 0 : 0,
             "stockCost"                     => $this->item->costPrice * $this->quantity,
             "stockDeficitCost"              => $this->item->costPrice * $this->variance,
+            "stockConsumedByPOS"            => $stockConsumedByPOS,
             "consumedSinceLastInventory"    => $consumedSinceLastInventory,
             "consumptionCost"               => $this->item->costPrice * $consumedSinceLastInventory,
             "stockIn"                       => $this->getStockInSince($lastInventory->closed_at ?? null),
