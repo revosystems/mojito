@@ -9,6 +9,8 @@ return [
     "taxClass"       	    => "\\Tax",
     "inventoryClass"        => "\\Inventory",
     "inventoryContentClass" => "\\InventoryContent",
+    "vendorClass"           => "\\Vendor",
+    "vendorItemClass"       => "\\VendorItemPivot",
 
     "stocksTable"           => "stocks",
     "assembliesTable"       => "assemblies",

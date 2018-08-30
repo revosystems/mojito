@@ -55,7 +55,7 @@ class PurchaseOrderContent extends Model
 
     public function vendorItem()
     {
-        return $this->belongsTo(VendorItemPivot::class, 'item_vendor_id')->withTrashed();
+        return $this->belongsTo(config('mojito.vendorItemClass', VendorItemPivot::class), 'item_vendor_id')->withTrashed();
     }
 
     //============================================================================

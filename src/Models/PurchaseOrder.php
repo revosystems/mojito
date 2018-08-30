@@ -77,7 +77,7 @@ class PurchaseOrder extends Model
     //============================================================================
     public function vendor()
     {
-        return $this->belongsTo(Vendor::class);
+        return $this->belongsTo(config('mojito.vendorClass', Vendor::class));
     }
 
     public function contents()
