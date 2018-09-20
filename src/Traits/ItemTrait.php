@@ -120,10 +120,11 @@ trait ItemTrait
      * Decrease item stock, if it has assembly items, the item itself is not decreased
      * @param $qty the quantity to decrease, if quantity is <0 the items will be added
      * @param $warehouse the warehouse were we are decreasing the inventory (if it is there)
-     * @param $weight 1 the weight that is discounted if item uses weight
+     * @param int $weight 1 the weight that is discounted if item uses weight
      * @param int $unit_id the unit id if other than the item itself
+     * @param bool $isSale
      */
-    public function decreaseStock($qty, $warehouse, $weight = 1, $unit_id = null)
+    public function decreaseStock($qty, $warehouse, $weight = 1, $unit_id = null, $isSale = true)
     {
         $usesStockManagementKey = config('mojito.usesStockManagementKey');
         if ($warehouse == null || ! $this->$usesStockManagementKey || $qty == 0) {
@@ -141,13 +142,13 @@ trait ItemTrait
         if ($this->hasAssemblies()) {
             foreach ($this->assemblies as $assembledItem) {
                 if ($assembledItem->$usesStockManagementKey && $warehouse->stockByItem($assembledItem)) { //If item is in warehouse
-                    $warehouse->add($assembledItem->id, -($qty * $assembledItem->pivot->quantity), $assembledItem->pivot->unit_id);
+                    $warehouse->add($assembledItem->id, -($qty * $assembledItem->pivot->quantity), $assembledItem->pivot->unit_id, $isSale);
                 }
             }
             return;
         }
         if ($warehouse->stockByItem($this)) { //If item is in warehouse
-            $warehouse->add($this->id, -$qty, $unit_id);
+            $warehouse->add($this->id, -$qty, $unit_id, $isSale);
         }
     }
 
