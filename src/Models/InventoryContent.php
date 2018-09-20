@@ -104,8 +104,9 @@ class InventoryContent extends Model
     protected function consumedQuantityWithAdd($lastInventoryClosedAt)
     {
         return $this->stockMovementsQuery($lastInventoryClosedAt)
-            ->where("action", $this->warehouseClass::ACTION_ADD)
-            ->where("to_warehouse_id", $this->inventory->warehouse_id)
+            ->where(function ($query) {
+                $query->where("action", $this->warehouseClass::ACTION_ADD)->orWhere('action', $this->warehouseClass::ACTION_SALE);
+            })->where("to_warehouse_id", $this->inventory->warehouse_id)
             ->where("quantity", "<", 0)->sum('quantity');
     }
 
