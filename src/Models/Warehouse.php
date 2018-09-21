@@ -93,7 +93,7 @@ class Warehouse extends Model
         $pivot      = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $itemId)->first();
 
         if ($pivot == null) {
-            $this->setInventory($itemId, $qty, $unit_id, $isSale);
+            $this->setInventory($itemId, $qty, $unit_id);
         } else {
             $qty    = Unit::convert($qty, $unit_id, $pivot->unit_id);
             $pivot->update(["quantity" => $pivot->quantity + $qty]);
@@ -167,7 +167,7 @@ class Warehouse extends Model
      * @return bool
      */
 
-    public function setInventory($itemId, $qty, $unit_id = null, $isSale = false)
+    public function setInventory($itemId, $qty, $unit_id = null)
     {
         $stockClass = config('mojito.stockClass','Stock');
         $pivot      = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id','=',$itemId)->first();
@@ -194,7 +194,7 @@ class Warehouse extends Model
             'item_id'           => $itemId,
             'to_warehouse_id'   => $this->id,
             'quantity'          => $qty,
-            'action'            => $isSale ? Warehouse::ACTION_SALE : Warehouse::ACTION_SET_INVENTORY
+            'action'            => Warehouse::ACTION_SET_INVENTORY
         ]);
         return true;
     }
