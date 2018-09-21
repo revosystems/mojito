@@ -36,7 +36,7 @@ class Warehouse extends Model
     public function stockByItem($menuItem)
     {
         $stockClass = config('mojito.stockClass', 'Stock');
-        return $stockClass ::where('warehouse_id', '=', $this->id)->where('item_id', '=', $menuItem->id)->first();
+        return $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $menuItem->id)->first();
     }
 
     public function stocksToRefill()
@@ -87,7 +87,7 @@ class Warehouse extends Model
      * @param bool $isSale
      * @return bool if can be added
      */
-    public function add($itemId, $qty, $unit_id = null, $isSale = false)
+    public function add($itemId, $qty, $unit_id = null)
     {
         $stockClass = config('mojito.stockClass', 'Stock');
         $pivot      = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $itemId)->first();
@@ -101,7 +101,7 @@ class Warehouse extends Model
                 'item_id'           => $itemId,
                 'to_warehouse_id'   => $this->id,
                 'quantity'          => $qty,
-                'action'            => $isSale ? Warehouse::ACTION_SALE : Warehouse::ACTION_ADD
+                'action'            => Warehouse::ACTION_ADD
             ]);
             return true;
         }
