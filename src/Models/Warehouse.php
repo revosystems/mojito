@@ -20,9 +20,10 @@ class Warehouse extends Model
         'name'  => 'required|min:3',
     ];
 
-    const ACTION_ADD             = 0;
-    const ACTION_MOVE            = 1;
-    const ACTION_SET_INVENTORY   = 2;
+    const ACTION_ADD                = 0;
+    const ACTION_MOVE               = 1;
+    const ACTION_SET_INVENTORY      = 2;
+    const ACTION_SALE               = 3;
 
     //============================================================================
     // RELATIONSHIPS
@@ -83,15 +84,16 @@ class Warehouse extends Model
      * @param $itemId
      * @param $qty
      * @param $unit_id to to the conversion
+     * @param bool $isSale
      * @return bool if can be added
      */
-    public function add($itemId, $qty, $unit_id = null)
+    public function add($itemId, $qty, $unit_id = null, $isSale = false)
     {
         $stockClass = config('mojito.stockClass', 'Stock');
         $pivot      = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $itemId)->first();
 
         if ($pivot == null) {
-            $this->setInventory($itemId, $qty, $unit_id);
+            $this->setInventory($itemId, $qty, $unit_id, $isSale);
         } else {
             $qty    = Unit::convert($qty, $unit_id, $pivot->unit_id);
             $pivot->update(["quantity" => $pivot->quantity + $qty]);
@@ -99,7 +101,7 @@ class Warehouse extends Model
                 'item_id'           => $itemId,
                 'to_warehouse_id'   => $this->id,
                 'quantity'          => $qty,
-                'action'            => Warehouse::ACTION_ADD
+                'action'            => $isSale ? Warehouse::ACTION_SALE : Warehouse::ACTION_ADD
             ]);
             return true;
         }
@@ -161,12 +163,14 @@ class Warehouse extends Model
      * @param $itemId
      * @param $qty
      * @param $unit_id to to the conversion
+     * @param bool $isSale
      * @return bool
      */
 
-    public function setInventory($itemId, $qty, $unit_id = null){
+    public function setInventory($itemId, $qty, $unit_id = null, $isSale = false)
+    {
         $stockClass = config('mojito.stockClass','Stock');
-        $pivot      = $stockClass::where('warehouse_id','=',$this->id)->where('item_id','=',$itemId)->first();
+        $pivot      = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id','=',$itemId)->first();
 
         if ($pivot == null) {
             if ($unit_id == null) {
@@ -190,7 +194,7 @@ class Warehouse extends Model
             'item_id'           => $itemId,
             'to_warehouse_id'   => $this->id,
             'quantity'          => $qty,
-            'action'            => Warehouse::ACTION_SET_INVENTORY
+            'action'            => $isSale ? Warehouse::ACTION_SALE : Warehouse::ACTION_SET_INVENTORY
         ]);
         return true;
     }
