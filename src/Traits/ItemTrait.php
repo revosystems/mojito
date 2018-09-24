@@ -6,6 +6,7 @@ use BadChoice\Mojito\Models\Assembly;
 use BadChoice\Mojito\Models\Vendor;
 use BadChoice\Mojito\Models\VendorItemPivot;
 use BadChoice\Mojito\Models\Unit;
+use BadChoice\Mojito\Models\Warehouse;
 use Illuminate\Database\Eloquent\Model;
 
 trait ItemTrait
@@ -118,16 +119,16 @@ trait ItemTrait
 
     /**
      * Decrease item stock, if it has assembly items, the item itself is not decreased
-     * @param $decreaseQuantity
+     * @param $qty the quantity to decrease, if quantity is <0 the items will be added
      * @param $warehouse the warehouse were we are decreasing the inventory (if it is there)
      * @param int $weight 1 the weight that is discounted if item uses weight
      * @param int $unit_id the unit id if other than the item itself
      * @param $action
      */
-    public function decreaseStock($decreaseQuantity, $warehouse, $weight = 1, $unit_id = null, $action = config('mojito.warehouseClass', 'Warehouse')::ACTION_SALE )
+    public function decreaseStock($qty, $warehouse, $weight = 1, $unit_id = null, $action = Warehouse::ACTION_SALE)
     {
         $usesStockManagementKey = config('mojito.usesStockManagementKey');
-        if ($warehouse == null || ! $this->$usesStockManagementKey || $decreaseQuantity == 0) {
+        if ($warehouse == null || ! $this->$usesStockManagementKey || $qty == 0) {
             return;
         }
 
@@ -136,20 +137,19 @@ trait ItemTrait
         }
 
         if ($this->usesWeight) {
-            $decreaseQuantity *= $weight;
+            $qty *= $weight;
         }
 
-        $stockClass         = config('mojito.stockClass', 'Stock');
         if ($this->hasAssemblies()) {
             foreach ($this->assemblies as $assembledItem) {
                 if ($assembledItem->$usesStockManagementKey && $warehouse->stockByItem($assembledItem)) { //If item is in warehouse
-                    $warehouse->stockByItem($assembledItem)->decrease($decreaseQuantity * $assembledItem->pivot->quantity, $assembledItem->pivot->unit_id, $action);
+                    $warehouse->stockByItem($assembledItem)->decrease($qty * $assembledItem->pivot->quantity, $assembledItem->pivot->unit_id, $action);
                 }
             }
             return;
         }
         if ($warehouse->stockByItem($this)) { //If item is in warehouse
-            $warehouse->stockByItem($this)->decrease($decreaseQuantity, $unit_id, $action);
+            $warehouse->stockByItem($this)->decrease($qty, $unit_id, $action);
         }
     }
 

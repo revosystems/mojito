@@ -84,7 +84,6 @@ class Warehouse extends Model
      * @param $itemId
      * @param $qty
      * @param $unit_id to to the conversion
-     * @param bool $isSale
      * @return bool if can be added
      */
     public function add($itemId, $qty, $unit_id = null)
@@ -163,7 +162,6 @@ class Warehouse extends Model
      * @param $itemId
      * @param $qty
      * @param $unit_id to to the conversion
-     * @param bool $isSale
      * @return bool
      */
 

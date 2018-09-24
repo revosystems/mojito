@@ -76,7 +76,7 @@ class Stock extends Model
         static::findWith($item_id, $warehouse_id)->delete();
     }
 
-    public function decrease($decreaseQuantity, $unit_id = null, $type = Warehouse::ACTION_SALE)
+    public function decrease($decreaseQuantity, $unit_id = null, $action = Warehouse::ACTION_SALE)
     {
         $decreaseQuantity    = Unit::convert($decreaseQuantity, $unit_id, $this->unit_id);
         $this->update(["quantity" => $this->quantity - $decreaseQuantity]);
@@ -84,7 +84,7 @@ class Stock extends Model
             'item_id'           => $this->item_id,
             'to_warehouse_id'   => $this->warehouse_id,
             'quantity'          => -$decreaseQuantity,
-            'action'            => $type
+            'action'            => $action
         ]);
     }
 }
