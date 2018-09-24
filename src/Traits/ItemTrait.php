@@ -142,14 +142,14 @@ trait ItemTrait
 
         if ($this->hasAssemblies()) {
             foreach ($this->assemblies as $assembledItem) {
-                if ($assembledItem->$usesStockManagementKey && $warehouse->stockByItem($assembledItem)) { //If item is in warehouse
-                    $warehouse->stockByItem($assembledItem)->decrease($qty * $assembledItem->pivot->quantity, $assembledItem->pivot->unit_id, $action);
+                if ($assembledItem->$usesStockManagementKey && $stock = $warehouse->stockByItem($assembledItem)) { //If item is in warehouse
+                    $stock->decrease($qty * $assembledItem->pivot->quantity, $assembledItem->pivot->unit_id, $action);
                 }
             }
             return;
         }
-        if ($warehouse->stockByItem($this)) { //If item is in warehouse
-            $warehouse->stockByItem($this)->decrease($qty, $unit_id, $action);
+        if ($stock = $warehouse->stockByItem($this)) { //If item is in warehouse
+            $stock->decrease($qty, $unit_id, $action);
         }
     }
 
