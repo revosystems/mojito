@@ -6,6 +6,7 @@ use BadChoice\Mojito\Models\Assembly;
 use BadChoice\Mojito\Models\Vendor;
 use BadChoice\Mojito\Models\VendorItemPivot;
 use BadChoice\Mojito\Models\Unit;
+use BadChoice\Mojito\Models\Warehouse;
 use Illuminate\Database\Eloquent\Model;
 
 trait ItemTrait
@@ -122,9 +123,9 @@ trait ItemTrait
      * @param $warehouse the warehouse were we are decreasing the inventory (if it is there)
      * @param int $weight 1 the weight that is discounted if item uses weight
      * @param int $unit_id the unit id if other than the item itself
-     * @param bool $isSale
+     * @param $action
      */
-    public function decreaseStock($qty, $warehouse, $weight = 1, $unit_id = null, $isSale = true)
+    public function decreaseStock($qty, $warehouse, $weight = 1, $unit_id = null, $action = Warehouse::ACTION_SALE)
     {
         $usesStockManagementKey = config('mojito.usesStockManagementKey');
         if ($warehouse == null || ! $this->$usesStockManagementKey || $qty == 0) {
@@ -141,14 +142,14 @@ trait ItemTrait
 
         if ($this->hasAssemblies()) {
             foreach ($this->assemblies as $assembledItem) {
-                if ($assembledItem->$usesStockManagementKey && $warehouse->stockByItem($assembledItem)) { //If item is in warehouse
-                    $warehouse->add($assembledItem->id, -($qty * $assembledItem->pivot->quantity), $assembledItem->pivot->unit_id, $isSale);
+                if ($assembledItem->$usesStockManagementKey && $stock = $warehouse->stockByItem($assembledItem)) { //If item is in warehouse
+                    $stock->decrease($qty * $assembledItem->pivot->quantity, $assembledItem->pivot->unit_id, $action);
                 }
             }
             return;
         }
-        if ($warehouse->stockByItem($this)) { //If item is in warehouse
-            $warehouse->add($this->id, -$qty, $unit_id, $isSale);
+        if ($stock = $warehouse->stockByItem($this)) { //If item is in warehouse
+            $stock->decrease($qty, $unit_id, $action);
         }
     }
 
