@@ -11,7 +11,7 @@ class PurchaseOrderContent extends Model
 
     protected $table    = "purchase_order_contents";
     protected $guarded  = ['id'];
-    protected $appends  = ['itemName', 'itemBarcode'];
+    protected $appends  = ['itemName', 'itemBarcode', 'item_id'];
     protected $hidden   = ['item', 'vendorItem'];
 
     const STATUS_PENDING            = 0;
@@ -69,6 +69,11 @@ class PurchaseOrderContent extends Model
     public function getItemBarcodeAttribute()
     {
         return $this->vendorItem->item->barcode ?? "";
+    }
+
+    public function getItemIdAttribute()
+    {
+        return $this->vendorItem->item_id ?? "";
     }
 
     //============================================================================
