@@ -10,6 +10,7 @@ class PurchaseOrderHandler
 {
     protected $purchaseOrder;
     protected $warehouseId;
+    protected $changes = [];
 
     public static function create($items, $vendorId)
     {
