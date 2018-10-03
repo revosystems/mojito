@@ -32,7 +32,7 @@ class PurchaseOrder extends Model
                     'price'          => $item->costPrice,
                     'quantity'       => $item->quantity,
                     'item_vendor_id' => $item->pivot_id,
-                ]))->makeHidden(['itemName', 'itemBarcode']);
+                ]))->makeHidden(['itemName', 'itemBarcode', 'item_id']);
             })->toArray());
         });
         if ($order->shouldBeSent()) {
