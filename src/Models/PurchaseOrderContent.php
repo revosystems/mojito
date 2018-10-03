@@ -98,7 +98,7 @@ class PurchaseOrderContent extends Model
             'received' => $totalReceived,
             'status'   => $status,
         ]);
-        $this->order->touch()
+        $this->order->touch();
     }
 
     public function statusName()
