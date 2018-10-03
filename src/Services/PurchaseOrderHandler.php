@@ -9,7 +9,7 @@ use BadChoice\Mojito\Models\VendorItemPivot;
 class PurchaseOrderHandler
 {
     protected $purchaseOrder;
-    protected $warehouseId;
+    protected $warehouse;
     protected $changes = [];
 
     public static function create($items, $vendorId)
@@ -24,11 +24,11 @@ class PurchaseOrderHandler
         return PurchaseOrder::createWith($vendorId, $items);
     }
 
-    public static function make($purchaseOrderId, $warehouseId)
+    public static function make($purchaseOrderId, $warehouse)
     {
         $handler                = new static;
         $handler->purchaseOrder = PurchaseOrder::findOrFail($purchaseOrderId);
-        $handler->warehouseId   = $warehouseId;
+        $handler->warehouse   = $warehouse;
         return $handler;
     }
 
@@ -52,8 +52,13 @@ class PurchaseOrderHandler
 
     public function receiveAll()
     {
-        $this->purchaseOrder->receiveAll($this->warehouseId);
+        $this->purchaseOrder->receiveAll($this->warehouse->id);
         return $this;
+    }
+
+    public function getChanges()
+    {
+        return $this->changes;
     }
 
     private static function createVendorItemsIfNecessary($items, $vendorId) {
@@ -73,9 +78,13 @@ class PurchaseOrderHandler
     {
         collect($existingReceived)->each(function ($toReceive) use ($shouldReceive) {
             $purchaseOrderContent = PurchaseOrderContent::findOrFail($toReceive->content_id);
-            $purchaseOrderContent->update(["quantity" => $toReceive->expectedQuantity]);
+            if ($purchaseOrderContent->quantity != $toReceive->expectedQuantity) {
+                $this->logContentsQuantityUpdated($purchaseOrderContent, $toReceive->expectedQuantity);
+                $purchaseOrderContent->update(["quantity" => $toReceive->expectedQuantity]);
+            }
             if ($shouldReceive) {
-                $purchaseOrderContent->receive($toReceive->toReceive, $this->warehouseId);
+                $purchaseOrderContent->receive($toReceive->toReceive, $this->warehouse->id);
+                $this->logContentsReceived($purchaseOrderContent);
             }
         });
     }
@@ -85,24 +94,65 @@ class PurchaseOrderHandler
         collect($unExistingReceived)->each(function ($toReceive) use ($shouldReceive) {
             $content = $this->createOrderContent($toReceive);
             if ($shouldReceive) {
-                $content->receive($toReceive->toReceive, $this->warehouseId);
+                $content->receive($toReceive->toReceive, $this->warehouse->id);
             }
         });
     }
 
     private function createOrderContent($toReceive)
     {
+        $vendorItem = VendorItemPivot::firstOrCreate([
+            "item_id"   => $toReceive->item_id,
+            "vendor_id" => $this->purchaseOrder->vendor_id,
+        ], [
+            "unit_id" => 1,
+            "pack"    => 1,
+        ]);
+        if ($vendorItem->wasRecentlyCreated) {
+            $this->logVendorItemCreated($vendorItem);
+        }
         return PurchaseOrderContent::create([
             "order_id"          => $this->purchaseOrder->id,
-            "item_vendor_id"    => VendorItemPivot::firstOrCreate([
-                "item_id"   => $toReceive->item_id,
-                "vendor_id" => $this->purchaseOrder->vendor_id,
-            ], [
-                "unit_id" => 1,
-                "pack"    => 1,
-            ])->id,
-            "quantity"          => $toReceive->expectedQuantity ?? 0,
+            "item_vendor_id"    => $vendorItem->id,
+            "quantity"          => $toReceive->expectedQuantity,
             "status"            => PurchaseOrderContent::STATUS_PENDING
+        ]);
+    }
+
+    private function logMessage($translateKey, $replaceArray)
+    {
+        $message = __("mojito.{$translateKey}");
+        collect($replaceArray)->each(function ($value, $key) use (&$message) {
+            $message = str_replace("{{$key}}", "$value", $message);
+        });
+        array_push($this->changes, $message);
+        return $message;
+    }
+
+    private function logContentsQuantityUpdated($purchaseOrderContent, $receivedQuantity)
+    {
+        $this->logMessage('purchaseContentsQuantityUpdated', [
+            1 => nameOrDash($purchaseOrderContent->vendorItem->item),
+            2 => $purchaseOrderContent->quantity,
+            3 => $receivedQuantity,
+        ]);
+    }
+
+    private function logContentsReceived($purchaseOrderContent)
+    {
+        $this->logMessage('purchaseContentsReceived', [
+            1 => $purchaseOrderContent->received,
+            2 => $purchaseOrderContent->quantity,
+            3 => nameOrDash($purchaseOrderContent->vendorItem->item),
+            4 => nameOrDash($this->warehouse)
+        ]);
+    }
+
+    private function logVendorItemCreated($vendorItem)
+    {
+        $this->logMessage("vendorItemAddedToVendor", [
+            1 => nameOrDash($vendorItem->item),
+            2 => nameOrDash($vendorItem->vendor)
         ]);
     }
 }
