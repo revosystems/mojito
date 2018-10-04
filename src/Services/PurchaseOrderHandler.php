@@ -5,6 +5,7 @@ namespace BadChoice\Mojito\Services;
 use BadChoice\Mojito\Models\PurchaseOrder;
 use BadChoice\Mojito\Models\PurchaseOrderContent;
 use BadChoice\Mojito\Models\VendorItemPivot;
+use Carbon\Carbon;
 
 class PurchaseOrderHandler
 {
@@ -53,6 +54,7 @@ class PurchaseOrderHandler
     public function receiveAll()
     {
         $this->purchaseOrder->receiveAll($this->warehouse->id);
+        $this->logMessage('fullyReceived', [1 => $this->purchaseOrder->id, 2 => timeZoned(Carbon::now())]);
         return $this;
     }
 
