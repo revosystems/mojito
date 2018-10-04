@@ -1,6 +1,6 @@
 <?php
 
-namespace BadChoice\Mojito\Services;
+namespace BadChoice\Mojito\Services\PurchaseOrders;
 
 use BadChoice\Mojito\Models\PurchaseOrder;
 use BadChoice\Mojito\Models\PurchaseOrderContent;
@@ -9,9 +9,13 @@ use BadChoice\Mojito\Models\VendorItemPivot;
 class PurchaseOrderHandler
 {
     protected $purchaseOrder;
-    protected $warehouseId;
+    protected $warehouse;
+    protected $logger;
 
-    protected $changes = [];
+    public function __construct()
+    {
+        $this->logger = new PurchaseOrderLogger();
+    }
 
     public static function create($items, $vendorId)
     {
@@ -25,11 +29,11 @@ class PurchaseOrderHandler
         return PurchaseOrder::createWith($vendorId, $items);
     }
 
-    public static function make($purchaseOrderId, $warehouseId)
+    public static function make($purchaseOrderId, $warehouse)
     {
         $handler                = new static;
         $handler->purchaseOrder = PurchaseOrder::findOrFail($purchaseOrderId);
-        $handler->warehouseId   = $warehouseId;
+        $handler->warehouse     = $warehouse;
         return $handler;
     }
 
@@ -53,11 +57,18 @@ class PurchaseOrderHandler
 
     public function receiveAll()
     {
-        $this->purchaseOrder->receiveAll($this->warehouseId);
+        $this->purchaseOrder->receiveAll($this->warehouse->id);
+        $this->logger->fullyReceived($this->purchaseOrder);
         return $this;
     }
 
-    private static function createVendorItemsIfNecessary($items, $vendorId) {
+    public function getChanges()
+    {
+        return $this->logger->getChanges();
+    }
+
+    private static function createVendorItemsIfNecessary($items, $vendorId)
+    {
         return collect($items)->map(function ($item) use ($vendorId) {
             VendorItemPivot::firstOrCreate([
                 "item_id"   => $item->id,
@@ -74,9 +85,13 @@ class PurchaseOrderHandler
     {
         collect($existingReceived)->each(function ($toReceive) use ($shouldReceive) {
             $purchaseOrderContent = PurchaseOrderContent::findOrFail($toReceive->content_id);
-            $purchaseOrderContent->update(["quantity" => $toReceive->expectedQuantity]);
+            if ($purchaseOrderContent->quantity != $toReceive->expectedQuantity) {
+                $this->logger->contentsQuantityUpdated($purchaseOrderContent, $toReceive->expectedQuantity);
+                $purchaseOrderContent->update(["quantity" => $toReceive->expectedQuantity]);
+            }
             if ($shouldReceive) {
-                $purchaseOrderContent->receive($toReceive->toReceive, $this->warehouseId);
+                $purchaseOrderContent->receive($toReceive->toReceive, $this->warehouse->id);
+                $this->logger->contentsReceived($purchaseOrderContent, $this->warehouse);
             }
         });
     }
@@ -86,7 +101,7 @@ class PurchaseOrderHandler
         collect($unExistingReceived)->each(function ($toReceive) use ($shouldReceive) {
             $content = $this->createOrderContent($toReceive);
             if ($shouldReceive) {
-                $content->receive($toReceive->toReceive, $this->warehouseId);
+                $content->receive($toReceive->toReceive, $this->warehouse->id);
             }
         });
     }
@@ -95,15 +110,24 @@ class PurchaseOrderHandler
     {
         return PurchaseOrderContent::create([
             "order_id"          => $this->purchaseOrder->id,
-            "item_vendor_id"    => VendorItemPivot::firstOrCreate([
-                "item_id"   => $toReceive->item_id,
-                "vendor_id" => $this->purchaseOrder->vendor_id,
-            ], [
-                "unit_id" => 1,
-                "pack"    => 1,
-            ])->id,
-            "quantity"          => $toReceive->expectedQuantity ?? 0,
+            "item_vendor_id"    => $this->findOrCreateVendor($toReceive)->id,
+            "quantity"          => $toReceive->expectedQuantity,
             "status"            => PurchaseOrderContent::STATUS_PENDING
         ]);
+    }
+
+    private function findOrCreateVendor($toReceive)
+    {
+        $vendorItem = VendorItemPivot::firstOrCreate([
+            "item_id"   => $toReceive->item_id,
+            "vendor_id" => $this->purchaseOrder->vendor_id,
+        ], [
+            "unit_id" => 1,
+            "pack"    => 1,
+        ]);
+        if ($vendorItem->wasRecentlyCreated) {
+            $this->logger->vendorItemCreated($vendorItem);
+        }
+        return $vendorItem;
     }
 }
