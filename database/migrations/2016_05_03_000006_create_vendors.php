@@ -26,6 +26,7 @@ class CreateVendors extends Migration
             $table->string('email')         ->nullable();
             $table->string('phone')         ->nullable();
             $table->string('notes')         ->nullable();
+            $table->boolean('shouldBeNotified')->default(false);
 
             $table->timestamps();
             $table->softDeletes();
