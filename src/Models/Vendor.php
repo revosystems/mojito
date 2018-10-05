@@ -4,10 +4,12 @@ namespace BadChoice\Mojito\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 class Vendor extends Model
 {
     use SoftDeletes;
+    use Notifiable;
     protected $table        = "vendors";
     protected $hidden       = ['created_at','updated_at','deleted_at'];
     protected $guarded      = ['id'];
