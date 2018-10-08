@@ -8,7 +8,7 @@ use BadChoice\Mojito\Models\VendorItemPivot;
 
 class PurchaseOrderHandler
 {
-    protected $purchaseOrder;
+    public $purchaseOrder;
     protected $warehouse;
     protected $logger;
 
