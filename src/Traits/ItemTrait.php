@@ -3,8 +3,6 @@
 namespace BadChoice\Mojito\Traits;
 
 use BadChoice\Mojito\Models\Assembly;
-use BadChoice\Mojito\Models\Vendor;
-use BadChoice\Mojito\Models\VendorItemPivot;
 use BadChoice\Mojito\Models\Unit;
 use BadChoice\Mojito\Models\Warehouse;
 use Illuminate\Database\Eloquent\Model;
@@ -53,7 +51,7 @@ trait ItemTrait
 
     public function vendors()
     {
-        return $this->belongsToMany(Vendor::class, config('mojito.vendorItemsTable'), 'item_id', 'vendor_id')->withPivot('id', 'costPrice', 'unit_id', 'reference', 'tax_id', 'pack')->wherePivot('deleted_at', '=', null);
+        return $this->belongsToMany(config('mojito.vendorClass'), config('mojito.vendorItemsTable'), 'item_id', 'vendor_id')->withPivot('id', 'costPrice', 'unit_id', 'reference', 'tax_id', 'pack')->wherePivot('deleted_at', '=', null);
     }
 
     //=============================================================================
@@ -205,6 +203,7 @@ trait ItemTrait
         $stockClass = config('mojito.stockClass', 'Stock');
         $stockClass::byItem($this->id)->delete();
         Assembly::byMainItem($this->id)->delete();
-        VendorItemPivot::byItem($this->id)->delete();
+        $vendorItemClass = config('mojito.vendorItemClass', 'VendorItemPivot');
+        $vendorItemClass::byItem($this->id)->delete();
     }
 }

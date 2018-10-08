@@ -56,7 +56,7 @@ class VendorItemPivot extends Model
 
     public function vendor()
     {
-        return $this->belongsTo('BadChoice\Mojito\Models\Vendor', 'vendor_id');
+        return $this->belongsTo(config('mojito.vendorClass', 'Vendor'), 'vendor_id');
     }
 
     public function unit()

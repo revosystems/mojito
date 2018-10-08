@@ -20,10 +20,11 @@ class PurchaseOrderHandler
     public static function create($items, $vendorId)
     {
         $items = PurchaseOrderHandler::createVendorItemsIfNecessary($items, $vendorId)->map(function ($item) {
+            $vendorItemClass = config('mojito.vendorItemClass');
             return (object)[
                 'costPrice' => $item->costPrice ?? 0,
                 'quantity'  => $item->quantity,
-                'pivot_id'  => VendorItemPivot::where('item_id', $item->id)->where('vendor_id', request('vendor'))->first()->id,
+                'pivot_id'  => $vendorItemClass::where('item_id', $item->id)->where('vendor_id', request('vendor'))->first()->id,
             ];
         });
         return PurchaseOrder::createWith($vendorId, $items);
@@ -70,7 +71,8 @@ class PurchaseOrderHandler
     private static function createVendorItemsIfNecessary($items, $vendorId)
     {
         return collect($items)->map(function ($item) use ($vendorId) {
-            VendorItemPivot::firstOrCreate([
+            $vendorItemClass = config('mojito.vendorItemClass');
+            $vendorItemClass::firstOrCreate([
                 "item_id"   => $item->id,
                 "vendor_id" => $vendorId,
             ], [
@@ -118,7 +120,8 @@ class PurchaseOrderHandler
 
     private function findOrCreateVendor($toReceive)
     {
-        $vendorItem = VendorItemPivot::firstOrCreate([
+        $vendorItemClass = config('mojito.vendorItemClass');
+        $vendorItem = $vendorItemClass::firstOrCreate([
             "item_id"   => $toReceive->item_id,
             "vendor_id" => $this->purchaseOrder->vendor_id,
         ], [
