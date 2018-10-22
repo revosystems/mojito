@@ -67,6 +67,9 @@ class Warehouse extends Model
         if ($action == Warehouse::ACTION_SET_INVENTORY) {
             return trans('admin.setInventory');
         }
+        if ($action == Warehouse::ACTION_SALE) {
+            return trans_choice('admin.sale', 1);
+        }
     }
 
     public function delete()
