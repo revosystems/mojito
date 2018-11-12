@@ -30,13 +30,23 @@ class InventoryContent extends Model
         static::creating(function ($model) {
             $model->setExpectedQuantity();
         });
+        static::updating(function ($model) {
+            if ($model->isDirty('quantity')) {
+                $model->setVariance();
+            }
+        });
     }
 
     public function setExpectedQuantity()
     {
         $stockClass             = config('mojito.stockClass', 'Stock');
         $this->expectedQuantity = $stockClass::findWith($this->item_id, $this->inventory->warehouse_id)->quantity ?? 0;
-        $this->variance         = $this->quantity - $this->expectedQuantity;
+        $this->setVariance();
+    }
+
+    public function setVariance()
+    {
+        $this->variance = $this->quantity - $this->expectedQuantity;
     }
 
     public function item()
