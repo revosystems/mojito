@@ -81,6 +81,9 @@ class PurchaseOrderContent extends Model
     //============================================================================
     public function receive($quantity, $warehouseId)
     {
+        if (! $quantity) {
+            return;
+        }
         $warehouse  = Warehouse::find($warehouseId);
         $warehouse->add($this->vendorItem->item_id, $quantity, $this->vendorItem->unit_id);
 
