@@ -95,19 +95,16 @@ class Warehouse extends Model
         $pivot      = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $itemId)->first();
 
         if ($pivot == null) {
-            $this->setInventory($itemId, $qty, $unit_id);
-        } else {
-            $qty    = Unit::convert($qty, $unit_id, $pivot->unit_id);
-            $pivot->update(["quantity" => $pivot->quantity + $qty]);
-            StockMovement::create([
-                'item_id'           => $itemId,
-                'to_warehouse_id'   => $this->id,
-                'quantity'          => $qty,
-                'action'            => Warehouse::ACTION_ADD
-            ]);
-            return true;
+            return $this->setInventory($itemId, $qty, $unit_id);
         }
-        return false;
+        $qty    = Unit::convert($qty, $unit_id, $pivot->unit_id);
+        $pivot->update(["quantity" => $pivot->quantity + $qty]);
+        return StockMovement::create([
+            'item_id'           => $itemId,
+            'to_warehouse_id'   => $this->id,
+            'quantity'          => $qty,
+            'action'            => Warehouse::ACTION_ADD
+        ]);
     }
 
     /*
@@ -123,7 +120,7 @@ class Warehouse extends Model
         $stockClass = config('mojito.stockClass', 'Stock');
         $pivotFrom  = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $itemId)->first();
         if ($pivotFrom == null) {
-            return false;
+            return null;
         }
 
         $pivotTo = $stockClass::where('warehouse_id', '=', $toWarehouseId)->where('item_id', '=', $itemId)->first();
@@ -147,15 +144,13 @@ class Warehouse extends Model
         }
         $pivotFrom->update(["quantity" => $pivotFrom->quantity - $qty]);
 
-        StockMovement::create([
+        return StockMovement::create([
             'item_id'           => $itemId,
             'from_warehouse_id' => $this->id,
             'to_warehouse_id'   => $toWarehouseId,
             'quantity'          => $qty,
             'action'            => Warehouse::ACTION_MOVE
         ]);
-
-        return true;
     }
 
     /**
@@ -185,18 +180,15 @@ class Warehouse extends Model
                 'alert'        => 0,
                 'unit_id'      => $unit_id
             ]);
-
-        }
-        else{
+        } else{
             $pivot->update(["quantity" => $qty]);
         }
 
-        StockMovement::create([
+        return StockMovement::create([
             'item_id'           => $itemId,
             'to_warehouse_id'   => $this->id,
             'quantity'          => $qty,
             'action'            => Warehouse::ACTION_SET_INVENTORY
         ]);
-        return true;
     }
 }
