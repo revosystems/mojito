@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class InventoryContent extends Model
 {
     protected $guarded  = [];
-    protected $appends  = ["itemName"];
+    protected $appends  = ['itemName'];
     protected $lastInventory;
     private $stockClass;
     private $stockMovementClass;
@@ -63,7 +63,7 @@ class InventoryContent extends Model
     {
         $this->setClassFields();
         $this->calculateFields();
-        $this->updateStock();
+        $this->setStock();
     }
 
     protected function calculateFields()
@@ -72,25 +72,26 @@ class InventoryContent extends Model
         $stockConsumedByPOS         = $this->getQuantityConsumedSince($lastInventory->closed_at ?? null);
         $consumedSinceLastInventory = $stockConsumedByPOS - $this->variance;
         $this->update([
-            "previousQuantity"              => $lastInventory ? $lastInventory->contents()->where('item_id', $this->item_id)->first()->quantity ?? 0 : 0,
-            "stockCost"                     => $this->item->costPrice * $this->quantity,
-            "stockDeficitCost"              => $this->item->costPrice * $this->variance,
-            "stockConsumedByPOS"            => $stockConsumedByPOS,
-            "consumedSinceLastInventory"    => $consumedSinceLastInventory,
-            "consumptionCost"               => $this->item->costPrice * $consumedSinceLastInventory,
-            "stockIn"                       => $this->getStockInSince($lastInventory->closed_at ?? null),
-            "estimatedDaysLeft"             => $this->getEstimatedDaysLeft($lastInventory->closed_at ?? null, $consumedSinceLastInventory),
+            'previousQuantity'              => $lastInventory ? $lastInventory->contents()->where('item_id', $this->item_id)->first()->quantity ?? 0 : 0,
+            'stockCost'                     => $this->item->costPrice * $this->quantity,
+            'stockDeficitCost'              => $this->item->costPrice * $this->variance,
+            'stockConsumedByPOS'            => $stockConsumedByPOS,
+            'consumedSinceLastInventory'    => $consumedSinceLastInventory,
+            'consumptionCost'               => $this->item->costPrice * $consumedSinceLastInventory,
+            'stockIn'                       => $this->getStockInSince($lastInventory->closed_at ?? null),
+            'estimatedDaysLeft'             => $this->getEstimatedDaysLeft($lastInventory->closed_at ?? null, $consumedSinceLastInventory),
         ]);
     }
 
-    protected function updateStock()
+    protected function setStock()
     {
-        return $this->stockClass::updateOrCreate([
-            "item_id"       => $this->item_id,
-            "warehouse_id"  => $this->inventory->warehouse_id,
-        ], [
-            "quantity" => $this->quantity + StockMovement::where("created_at", ">", $this->inventory->closed_at ?? $this->item->created_at)->where('item_id', $this->item_id)->sum('quantity'),
-        ]);
+        $stockMovement = $this->warehouseClass::find($this->inventory->warehouse_id)->setInventory($this->item_id, $this->quantity + $this->getModifiedQuantitySinceInventoryRegistered());
+        $stockMovement->update(["created_at" => $this->inventory->closed_at]);
+    }
+
+    protected function getModifiedQuantitySinceInventoryRegistered()
+    {
+        return StockMovement::where('created_at', '>', $this->inventory->closed_at ?? $this->item->created_at)->where('item_id', $this->item_id)->sum('quantity');
     }
 
     protected function getLastInventory()
@@ -114,25 +115,25 @@ class InventoryContent extends Model
     protected function consumedQuantityWithAdd($lastInventoryClosedAt)
     {
         return $this->stockMovementsQuery($lastInventoryClosedAt)
-            ->where("action", $this->warehouseClass::ACTION_SALE)
-            ->where("to_warehouse_id", $this->inventory->warehouse_id)
+            ->where('action', $this->warehouseClass::ACTION_SALE)
+            ->where('to_warehouse_id', $this->inventory->warehouse_id)
             ->sum('quantity');
     }
 
     protected function consumedQuantityWithMove($lastInventoryClosedAt)
     {
-        return $this->stockMovementsQuery($lastInventoryClosedAt)->where("action", $this->warehouseClass::ACTION_MOVE)->where("from_warehouse_id", $this->inventory->warehouse_id)->sum('quantity');
+        return $this->stockMovementsQuery($lastInventoryClosedAt)->where('action', $this->warehouseClass::ACTION_MOVE)->where('from_warehouse_id', $this->inventory->warehouse_id)->sum('quantity');
     }
 
     protected function getStockInSince($lastInventoryClosedAt)
     {
         return $this->stockMovementsQuery($lastInventoryClosedAt)
-            ->where("to_warehouse_id", $this->inventory->warehouse_id)
+            ->where('to_warehouse_id', $this->inventory->warehouse_id)
             ->where(function ($query) {
-                $query->where("action", $this->warehouseClass::ACTION_ADD)
-                       ->where("quantity", ">", 0)
+                $query->where('action', $this->warehouseClass::ACTION_ADD)
+                       ->where('quantity', '>', 0)
                        ->orWhere(function ($query) {
-                           $query->where("action", $this->warehouseClass::ACTION_MOVE)->where("to_warehouse_id", $this->inventory->warehouse_id);
+                           $query->where('action', $this->warehouseClass::ACTION_MOVE)->where('to_warehouse_id', $this->inventory->warehouse_id);
                        });
             })->sum('quantity');  // Since we are working on same warehouse, units are the same and no conversion is required
     }
@@ -140,7 +141,7 @@ class InventoryContent extends Model
     protected function stockMovementsQuery($lastInventoryClosedAt)
     {
         return $this->stockMovementClass::where('item_id', $this->item_id)
-            ->whereBetween("created_at", [$lastInventoryClosedAt ? : $this->item->created_at, $this->inventory->closed_at]);
+            ->whereBetween('created_at', [$lastInventoryClosedAt ? : $this->item->created_at, $this->inventory->closed_at]);
     }
 
     protected function getEstimatedDaysLeft($lastInventoryClosedAt, $consumedSinceLastInventory)
