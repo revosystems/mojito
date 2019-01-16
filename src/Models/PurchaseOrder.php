@@ -120,17 +120,23 @@ class PurchaseOrder extends Model
      * Called for purchaseOrderContent, when it is updated, it updates the orderStatus
      * @return int
      */
-    public function calculateTotal()
+    public function calculateSubtotal()
     {
         return $this->contents->sum(function ($content) {
             return $content->quantity * $content->price;
         });
     }
 
-    public function calculateTax(){
+    public function calculateTax()
+    {
         return $this->contents->sum(function ($content) {
-            return $content->price * $content->quantity * ($content->vendorItem->tax->percentage ?? 0) / 100.0;
+            return $content->quantity * $content->price * ($content->vendorItem->tax->percentage ?? 0) / 100.0;
         });
+    }
+
+    public function calculateTotal()
+    {
+        return $this->calculateSubtotal() + $this->calculateTax();
     }
 
     /**

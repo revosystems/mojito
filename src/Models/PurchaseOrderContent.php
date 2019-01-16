@@ -27,9 +27,13 @@ class PurchaseOrderContent extends Model
     {
         parent::boot();
         static::saved(function ($purchaseOrderContent) {
-            $po = PurchaseOrder::find($purchaseOrderContent->order_id);
+            $po         = PurchaseOrder::find($purchaseOrderContent->order_id);
+            $tax        = $po->calculateTax();
+            $subtotal   = $po->calculateSubtotal();
             $po->update([
-                "total"     => $po->calculateTotal(),
+                "tax"       => $tax,
+                "subtotal"  => $subtotal,
+                "total"     => $subtotal + $tax,
                 "status"    => $po->calculateStatus(),
             ]);
         });
