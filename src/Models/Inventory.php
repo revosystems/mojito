@@ -28,7 +28,7 @@ class Inventory extends Model
 
     public function employee()
     {
-        return $this->belongsTo(config('mojito.employeeClass', 'Employee'), 'employee_id');
+        return $this->belongsTo(config('mojito.employeeClass', 'Employee'), 'employee_id')->withTrashed();
     }
 
     public function contents()
