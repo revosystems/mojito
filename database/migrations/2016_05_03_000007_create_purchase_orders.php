@@ -15,6 +15,7 @@ class CreatePurchaseOrders extends Migration
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->increments('id');
             $table->string('vendor_order_id')->nullable();
+            $table->string('reference')->nullable()->default(null);
 
             $table->decimal('subtotal', 8, 2) ->default(0);
             $table->decimal('tax', 8, 2) ->default(0);
