@@ -2,6 +2,7 @@
 
 namespace BadChoice\Mojito\Traits;
 
+use BadChoice\Mojito\Exceptions\UnitsNotCompatibleException;
 use BadChoice\Mojito\Models\Assembly;
 use BadChoice\Mojito\Models\Unit;
 use BadChoice\Mojito\Models\Warehouse;
@@ -86,7 +87,11 @@ trait ItemTrait
     public function assemblyPrice()
     {
         return $this->assemblies->sum(function ($assembly) {
-            $finalQty = Unit::convert($assembly->pivot->quantity, $assembly->pivot->unit, $assembly->unit);
+            try {
+                $finalQty = Unit::convert($assembly->pivot->quantity, $assembly->pivot->unit, $assembly->unit);
+            } catch (UnitsNotCompatibleException $e) {
+                return 0;
+            }
             return $assembly->costPrice * $finalQty;
         });
     }
