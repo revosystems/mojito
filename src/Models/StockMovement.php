@@ -19,22 +19,22 @@ class StockMovement extends Model
     //============================================================================
     public function item()
     {
-        return $this->belongsTo(config('mojito.itemClass', 'Item'), 'item_id');
+        return $this->belongsTo(config('mojito.itemClass', 'Item'), 'item_id')->withTrashed();
     }
 
     public function employee()
     {
-        return $this->belongsTo(config('mojito.employeeClass', 'Item'), 'tenantUser_id');
+        return $this->belongsTo(config('mojito.employeeClass', 'Item'), 'tenantUser_id')->withTrashed();
     }
 
     public function fromWarehouse()
     {
-        return $this->belongsTo(config('mojito.warehouseClass'), 'from_warehouse_id');
+        return $this->belongsTo(config('mojito.warehouseClass'), 'from_warehouse_id')->withTrashed();
     }
 
     public function toWarehouse()
     {
-        return $this->belongsTo(config('mojito.warehouseClass'), 'to_warehouse_id');
+        return $this->belongsTo(config('mojito.warehouseClass'), 'to_warehouse_id')->withTrashed();
     }
 
     public static function getSourceName($source)
