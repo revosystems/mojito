@@ -5,6 +5,7 @@ namespace BadChoice\Mojito\Models;
 use BadChoice\Grog\Traits\SaveNestedTrait;
 use BadChoice\Mojito\Exceptions\AlreadyApprovedException;
 use BadChoice\Mojito\Exceptions\AlreadyDeclinedException;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -20,6 +21,11 @@ class Inventory extends Model
 
     use SoftDeletes;
     use SaveNestedTrait;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 
     public function warehouse()
     {

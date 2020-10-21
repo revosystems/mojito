@@ -2,6 +2,7 @@
 
 namespace BadChoice\Mojito\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class Assembly extends Pivot
@@ -13,7 +14,13 @@ class Assembly extends Pivot
 
     public function __construct()
     {
+        parent::__construct();
         $this->table = config('mojito.assembliesTable');
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 
     public static function getTableName()

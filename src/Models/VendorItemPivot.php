@@ -2,6 +2,7 @@
 
 namespace BadChoice\Mojito\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -21,6 +22,11 @@ class VendorItemPivot extends Model
     {
         parent::__construct($attributes);
         $this->table = config('mojito.vendorItemsTable');
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 
     public static function canBeDeleted($id)

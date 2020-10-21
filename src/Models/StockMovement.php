@@ -2,6 +2,7 @@
 
 namespace BadChoice\Mojito\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 
 class StockMovement extends Model
@@ -13,6 +14,11 @@ class StockMovement extends Model
     const SOURCE_REVO_STOCKS    = 1;
     const SOURCE_PURCHASE       = 2;
     const SOURCE_BACK           = 3;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 
     //============================================================================
     // RELATIONSHIPS

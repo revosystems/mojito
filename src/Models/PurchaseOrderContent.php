@@ -2,6 +2,7 @@
 
 namespace BadChoice\Mojito\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -37,6 +38,11 @@ class PurchaseOrderContent extends Model
                 "status"    => $po->calculateStatus(),
             ]);
         });
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 
     //============================================================================

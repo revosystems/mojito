@@ -2,6 +2,7 @@
 
 namespace BadChoice\Mojito\Models;
 
+use DateTimeInterface;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -24,6 +25,11 @@ class Warehouse extends Model
     const ACTION_MOVE               = 1;
     const ACTION_SET_INVENTORY      = 2;
     const ACTION_SALE               = 3;
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 
     //============================================================================
     // RELATIONSHIPS
