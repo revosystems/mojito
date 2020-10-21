@@ -9,7 +9,7 @@
     ],
     "require": {
         "php": "^7.2.5",
-        "badchoice/grog": "^1.6.8",
+        "badchoice/grog": "^2.0.1",
         "illuminate/database": "^7.4"
     },
     "autoload": {
