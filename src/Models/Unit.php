@@ -3,6 +3,7 @@
 namespace BadChoice\Mojito\Models;
 
 use BadChoice\Mojito\Exceptions\UnitsNotCompatibleException;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -22,6 +23,11 @@ class Unit extends Model
     public static function getTableName()
     {
         return with(new static)->getTable();
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 
     //====================================================================

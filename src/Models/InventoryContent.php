@@ -3,6 +3,7 @@
 namespace BadChoice\Mojito\Models;
 
 use BadChoice\Grog\Traits\SaveNestedTrait;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -19,11 +20,6 @@ class InventoryContent extends Model
     use SoftDeletes;
     use SaveNestedTrait;
 
-    public function inventory()
-    {
-        return $this->belongsTo(config('mojito.inventoryClass', 'Inventory'));
-    }
-
     protected static function boot()
     {
         parent::boot();
@@ -35,6 +31,16 @@ class InventoryContent extends Model
                 $model->setVariance();
             }
         });
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
+
+    public function inventory()
+    {
+        return $this->belongsTo(config('mojito.inventoryClass', 'Inventory'));
     }
 
     public function setExpectedQuantity()

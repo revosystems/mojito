@@ -2,6 +2,7 @@
 
 namespace BadChoice\Mojito\Models;
 
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use BadChoice\Grog\Traits\SyncTrait;
@@ -19,6 +20,11 @@ class Stock extends Model
         'alert'     => 'integer',
         'quantity'  => 'numeric'
     ];
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 
     public static function findWith($item_id, $warehouse_id)
     {
