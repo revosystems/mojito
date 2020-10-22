@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "badchoice/grog",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/BadChoice/grog.git",
-                "reference": "6c22c97a37409c586e36844989c25e8525727419"
+                "reference": "febf37386ae16b62a3271c8eef3d7c3a057620bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/BadChoice/grog/zipball/6c22c97a37409c586e36844989c25e8525727419",
-                "reference": "6c22c97a37409c586e36844989c25e8525727419",
+                "url": "https://api.github.com/repos/BadChoice/grog/zipball/febf37386ae16b62a3271c8eef3d7c3a057620bc",
+                "reference": "febf37386ae16b62a3271c8eef3d7c3a057620bc",
                 "shasum": ""
             },
             "require": {
@@ -42,7 +42,7 @@
                 }
             ],
             "description": "Easy form builder from array",
-            "time": "2020-10-21T16:28:54+00:00"
+            "time": "2020-10-22T07:47:17+00:00"
         },
         {
             "name": "brick/math",
