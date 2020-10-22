@@ -14,8 +14,8 @@ class Assembly extends Pivot
 
     public function __construct()
     {
-        parent::__construct();
         $this->table = config('mojito.assembliesTable');
+        parent::__construct();
     }
 
     protected function serializeDate(DateTimeInterface $date)
@@ -30,8 +30,8 @@ class Assembly extends Pivot
 
     //*** Scopes don't work this way? **///
     /*public function __construct(Model $parent, $attributes, $table, $exists = false){
-        parent::__construct($parent, $attributes, $table, $exists);
         $this->table = config('mojito.assembliesTable');
+        parent::__construct($parent, $attributes, $table, $exists);
     }*/
 
     //============================================================================

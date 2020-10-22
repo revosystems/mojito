@@ -20,8 +20,8 @@ class VendorItemPivot extends Model
 
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
         $this->table = config('mojito.vendorItemsTable');
+        parent::__construct($attributes);
     }
 
     protected function serializeDate(DateTimeInterface $date)
