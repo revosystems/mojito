@@ -12,7 +12,7 @@ class VendorItemPivot extends Model
 
     protected $dates        = ['deleted_at'];
     protected $hidden       = ['created_at','updated_at','deleted_at'];
-    protected $guarded      = ['id'];
+    protected $guarded      = [];
 
     protected static $rules = [
         'costPrice'     => 'required|numeric',

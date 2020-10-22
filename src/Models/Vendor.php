@@ -13,7 +13,7 @@ class Vendor extends Model
     use Notifiable;
     protected $table        = "vendors";
     protected $hidden       = ['created_at','updated_at','deleted_at'];
-    protected $guarded      = ['id'];
+    protected $guarded      = [];
 
     protected static $rules = [
         'name'          => 'required|min:3',

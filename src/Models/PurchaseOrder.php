@@ -11,7 +11,7 @@ class PurchaseOrder extends Model
     use SoftDeletes;
 
     protected $table    = "purchase_orders";
-    protected $guarded  = ['id'];
+    protected $guarded  = [];
     protected $appends  = ['vendorName', 'contentsArray'];
     protected $hidden   = ['vendor', 'contents'];
 
