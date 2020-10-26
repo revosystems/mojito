@@ -12,7 +12,7 @@ class Unit extends Model
     use SoftDeletes;
 
     protected $table    = "units";
-    protected $guarded  = ['id'];
+    protected $guarded  = [];
 
     const STANDARD  = 1;
     const KG        = 2;

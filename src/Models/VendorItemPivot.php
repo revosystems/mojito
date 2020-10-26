@@ -12,7 +12,7 @@ class VendorItemPivot extends Model
 
     protected $dates        = ['deleted_at'];
     protected $hidden       = ['created_at','updated_at','deleted_at'];
-    protected $guarded      = ['id'];
+    protected $guarded      = [];
 
     protected static $rules = [
         'costPrice'     => 'required|numeric',
@@ -20,8 +20,8 @@ class VendorItemPivot extends Model
 
     public function __construct(array $attributes = [])
     {
-        parent::__construct($attributes);
         $this->table = config('mojito.vendorItemsTable');
+        parent::__construct($attributes);
     }
 
     protected function serializeDate(DateTimeInterface $date)
