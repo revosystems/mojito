@@ -4,6 +4,7 @@ namespace BadChoice\Mojito\Models;
 
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Assembly extends Pivot
 {
@@ -11,6 +12,8 @@ class Assembly extends Pivot
     protected $dates    = ['deleted_at'];
     protected $hidden   = ['created_at','updated_at','deleted_at'];
     protected $guarded  = [];
+
+    use SoftDeletes;
 
     public function __construct()
     {

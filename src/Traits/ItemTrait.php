@@ -63,7 +63,7 @@ trait ItemTrait
      */
     public function assemblies()
     {
-        return $this->belongsToMany(config('mojito.itemClass', 'Item'), config('mojito.assembliesTable', 'assemblies'), 'main_item_id', 'item_id')->withPivot('quantity', 'id', 'unit_id', 'deleted_at')->withTimestamps()->wherePivot('deleted_at', '=', null);
+        return $this->belongsToMany(config('mojito.itemClass', 'Item'), config('mojito.assembliesTable', 'assemblies'), 'main_item_id', 'item_id')->withPivot('quantity', 'id', 'unit_id', 'deleted_at')->withTimestamps()->wherePivot('deleted_at', '=', null)->using(config('mojito.assemblyClass', 'Assembly'));
     }
 
     /**
@@ -180,19 +180,6 @@ trait ItemTrait
         }
 
         return $synced;
-    }
-
-    //===================================
-    // Pivot creators
-    //===================================
-    public function newPivot(Model $parent, array $attributes, $table, $exists, $usingNull = null)
-    {
-        if ($table == config('mojito.assembliesTable', 'assemblies')) {
-            $pivot             = new Assembly($parent, $attributes, $table, $exists);
-            $pivot->attributes = $attributes;
-            return $pivot;
-        }
-        return parent::newPivot($parent, $attributes, $table, $exists, $usingNull);
     }
 
     //=============================================================================
