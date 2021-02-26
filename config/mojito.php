@@ -11,6 +11,7 @@ return [
     "inventoryContentClass" => "\\InventoryContent",
     "vendorClass"           => "\\Vendor",
     "vendorItemClass"       => "\\VendorItemPivot",
+    "assemblyClass"         => "\\Assembly",
 
     "stocksTable"           => "stocks",
     "assembliesTable"       => "assemblies",
