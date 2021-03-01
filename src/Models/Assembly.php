@@ -15,10 +15,10 @@ class Assembly extends Pivot
 
     use SoftDeletes;
 
-    public function __construct()
+    public function __construct(array $attributes = [])
     {
         $this->table = config('mojito.assembliesTable');
-        parent::__construct();
+        parent::__construct($attributes);
     }
 
     protected function serializeDate(DateTimeInterface $date)
