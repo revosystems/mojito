@@ -80,7 +80,8 @@ trait ItemTrait
      */
     public function assembledTo()
     {
-        return $this->belongsToMany(config('mojito.itemClass', 'Item'), config('mojito.assembliesTable', 'assemblies'), 'item_id', 'main_item_id')->withPivot('quantity', 'id', 'unit_id', 'deleted_at')->withTimestamps()->wherePivot('deleted_at', '=', null);
+        return $this->belongsToMany(config('mojito.itemClass', 'Item'), config('mojito.assembliesTable', 'assemblies'), 'item_id', 'main_item_id')
+            ->withPivot('quantity', 'id', 'unit_id', 'deleted_at')->withTimestamps()->wherePivot('deleted_at', '=', null)->using(config('mojito.assemblyClass', 'Assembly'));
     }
 
     public function assemblyPrice()
