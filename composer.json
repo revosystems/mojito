@@ -1,5 +1,5 @@
 {
-    "name": "badchoice/mojito",
+    "name": "revosystems/mojito",
     "description": "Stock management system",
     "authors": [
         {
@@ -8,9 +8,9 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
-        "badchoice/grog": "^2.0.3",
-        "illuminate/database": "^7.4"
+        "php": "^7.3",
+        "revosystems/grog": "dev-master",
+        "illuminate/database": "8.x"
     },
     "autoload": {
         "psr-4": {
