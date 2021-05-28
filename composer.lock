@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cd37e34af21083843fd7c3a1183ac818",
+    "content-hash": "285b12755ad20f672ea43d085e5f6ae9",
     "packages": [
         {
             "name": "brick/math",
@@ -1787,7 +1787,7 @@
         },
         {
             "name": "revosystems/grog",
-            "version": "dev-master",
+            "version": "8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/revosystems/grog.git",
@@ -1807,7 +1807,6 @@
                 "laravelcollective/html": "^6.1",
                 "php": "^7.3"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -1823,7 +1822,7 @@
             ],
             "description": "Easy form builder from array",
             "support": {
-                "source": "https://github.com/revosystems/grog/tree/master"
+                "source": "https://github.com/revosystems/grog/tree/8.1"
             },
             "time": "2021-05-18T14:21:23+00:00"
         },
@@ -4341,9 +4340,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "revosystems/grog": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

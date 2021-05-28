@@ -9,8 +9,8 @@
     ],
     "require": {
         "php": "^7.3",
-        "revosystems/grog": "dev-master",
-        "illuminate/database": "8.x"
+        "illuminate/database": "8.x",
+        "revosystems/grog": "8.1"
     },
     "autoload": {
         "psr-4": {
