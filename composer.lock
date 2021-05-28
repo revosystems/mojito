@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "285b12755ad20f672ea43d085e5f6ae9",
+    "content-hash": "9639fb3d707cfe5fd75bcd34189ee2c0",
     "packages": [
         {
             "name": "brick/math",
@@ -1787,16 +1787,16 @@
         },
         {
             "name": "revosystems/grog",
-            "version": "8.1",
+            "version": "8.43",
             "source": {
                 "type": "git",
                 "url": "https://github.com/revosystems/grog.git",
-                "reference": "2273d9dcf837a310c36ab4d74d10326edf8e5833"
+                "reference": "63d5444f54d350896e4bf886a574db18574e6695"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/revosystems/grog/zipball/2273d9dcf837a310c36ab4d74d10326edf8e5833",
-                "reference": "2273d9dcf837a310c36ab4d74d10326edf8e5833",
+                "url": "https://api.github.com/repos/revosystems/grog/zipball/63d5444f54d350896e4bf886a574db18574e6695",
+                "reference": "63d5444f54d350896e4bf886a574db18574e6695",
                 "shasum": ""
             },
             "require": {
@@ -1822,9 +1822,9 @@
             ],
             "description": "Easy form builder from array",
             "support": {
-                "source": "https://github.com/revosystems/grog/tree/8.1"
+                "source": "https://github.com/revosystems/grog/tree/8.43"
             },
-            "time": "2021-05-18T14:21:23+00:00"
+            "time": "2021-05-28T10:36:29+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
