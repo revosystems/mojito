@@ -70,7 +70,7 @@ class Inventory extends Model
     public function approve()
     {
         $this->validateCanUpdateStatus();
-        $this->contents->each->approve();
+        $this->contents()->with('inventory', 'item')->get()->each->approve();
         $this->update(["status" => static::STATUS_APPROVED]);
     }
 

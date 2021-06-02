@@ -135,7 +135,7 @@ class PurchaseOrder extends Model
 
     public function calculateTax()
     {
-        return $this->contents->sum(function ($content) {
+        return $this->contents()->with('vendorItem.tax')->get()->sum(function ($content) {
             return $content->quantity * $content->price * ($content->vendorItem->tax->percentage ?? 0) / 100.0;
         });
     }
@@ -173,7 +173,7 @@ class PurchaseOrder extends Model
 
     public function receiveAll($warehouse_id)
     {
-        $this->contents->each(function ($content) use ($warehouse_id) {
+        $this->contents()->with('vendorItem', 'order')->get()->each(function ($content) use ($warehouse_id) {
             $content->receive($content->quantity - $content->received, $warehouse_id);
         });
     }
