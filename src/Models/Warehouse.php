@@ -89,26 +89,18 @@ class Warehouse extends Model
 
     /**
      * Add qty stock to MenuItem with id $itemId, if this item doesn't exist for the warehouse it is created
-     *
-     * @param $itemId
-     * @param $qty
-     * @param $unit_id to to the conversion
-     * @return bool if can be added
      */
-    public function add($itemId, $qty, $unit_id = null)
+    public function add(int $itemId, float $quantity, ?int $unitId = null)
     {
-        $stockClass = config('mojito.stockClass', 'Stock');
-        $pivot      = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $itemId)->first();
-
-        if ($pivot == null) {
-            return $this->setInventory($itemId, $qty, $unit_id);
+        if (! $stock = $this->stocks()->where('item_id', $itemId)->first()) {
+            return $this->setInventory($itemId, $quantity, $unitId);
         }
-        $qty    = Unit::convert($qty, $unit_id, $pivot->unit_id);
-        $pivot->update(["quantity" => $pivot->quantity + $qty]);
+        $quantity    = Unit::convert($quantity, $unitId, $stock->unit_id);
+        $stock->update(["quantity" => $stock->quantity + $quantity]);
         return StockMovement::create([
             'item_id'           => $itemId,
             'to_warehouse_id'   => $this->id,
-            'quantity'          => $qty,
+            'quantity'          => $quantity,
             'action'            => Warehouse::ACTION_ADD
         ]);
     }
@@ -116,45 +108,20 @@ class Warehouse extends Model
     /*
      * Move qty stock of MenuItem from this warehouse to $warehouseId, if this item doesn't exist on toWarehouse it is created
      * It needs to exist en warehouse to be able to be moved
-     *
-     * @param $itemId the item we want to move
-     * @param $toWarehouseId the warehouse we want to move to
-     * @param $qty the quantity we are moving
      */
-    public function move($itemId, $toWarehouseId, $qty)
+    public function move(int $itemId, int $toWarehouseId, float $quantity)
     {
-        $stockClass = config('mojito.stockClass', 'Stock');
-        $pivotFrom  = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id', '=', $itemId)->first();
-        if ($pivotFrom == null) {
+        if (! $stockFrom = $this->stocks()->where('item_id', $itemId)->first()) {
             return null;
         }
 
-        $pivotTo = $stockClass::where('warehouse_id', '=', $toWarehouseId)->where('item_id', '=', $itemId)->first();
-
-        if ($pivotTo != null) {
-            $destQty = Unit::convert($qty, $pivotFrom->unit_id, $pivotTo->unit_id);
-        } else {
-            $destQty = $qty;
-        }
-
-        if ($pivotTo == null) {
-            $stockClass::create([
-                'warehouse_id' => $toWarehouseId,
-                'item_id'      => $itemId,
-                'quantity'     => $qty,
-                'unit_id'      => $pivotFrom->unit_id,
-                'alert'        => 0,
-            ]);
-        } else {
-            $pivotTo->update(["quantity" => $pivotTo->quantity + $destQty]);
-        }
-        $pivotFrom->update(["quantity" => $pivotFrom->quantity - $qty]);
-
+        static::updateStock($itemId, $quantity, $toWarehouseId, $stockFrom->unit_id, Warehouse::ACTION_MOVE);
+        $stockFrom->update(["quantity" => $stockFrom->quantity - $quantity]);
         return StockMovement::create([
             'item_id'           => $itemId,
             'from_warehouse_id' => $this->id,
             'to_warehouse_id'   => $toWarehouseId,
-            'quantity'          => $qty,
+            'quantity'          => $quantity,
             'action'            => Warehouse::ACTION_MOVE
         ]);
     }
@@ -162,39 +129,39 @@ class Warehouse extends Model
     /**
      * Sets the quantity $qty to the item at warehouse, the previous data will not be taken in account,
      * if item doesn't exist on that warehouse it will be created
-     *
-     * @param $itemId
-     * @param $qty
-     * @param $unit_id to to the conversion
-     * @return bool
      */
-
-    public function setInventory($itemId, $qty, $unit_id = null)
+    public function setInventory(int $itemId, float $quantity, ?int $unitId = null)
     {
-        $stockClass = config('mojito.stockClass','Stock');
-        $pivot      = $stockClass::where('warehouse_id', '=', $this->id)->where('item_id','=',$itemId)->first();
-
-        if ($pivot == null) {
-            if ($unit_id == null) {
-                $itemClass = config('mojito.itemClass', 'Item');
-                $unit_id   = $itemClass::find($itemId)->unit_id;
-            }
-            $stockClass::create([
-                'warehouse_id' => $this->id,
-                'item_id'      => $itemId,
-                'quantity'     => $qty,
-                'alert'        => 0,
-                'unit_id'      => $unit_id
-            ]);
-        } else{
-            $pivot->update(["quantity" => $qty]);
+        if (! $unitId) {
+            $itemClass = config('mojito.itemClass', 'Item');
+            $unitId = $itemClass::find($itemId)->unit_id;
         }
-
+        static::updateStock($itemId, $quantity, $this->id, $unitId, Warehouse::ACTION_SET_INVENTORY);
         return StockMovement::create([
             'item_id'           => $itemId,
             'to_warehouse_id'   => $this->id,
-            'quantity'          => $qty,
+            'quantity'          => $quantity,
             'action'            => Warehouse::ACTION_SET_INVENTORY
         ]);
+    }
+
+    protected static function updateStock(int $itemId, float $quantity, int $warehouseId, int $unitId, int $action)
+    {
+        $stockClass = config('mojito.stockClass', 'Stock');
+        if (! $stock = $stockClass::where('warehouse_id', '=', $warehouseId)->where('item_id', $itemId)->first()) {
+            return $stockClass::create([
+                'warehouse_id' => $warehouseId,
+                'item_id'      => $itemId,
+                'quantity'     => $quantity,
+                'alert'        => 0,
+                'unit_id'      => $unitId,
+            ]);
+        }
+        $stock->update([
+            "quantity" => $action == static::ACTION_SET_INVENTORY
+                ? $quantity
+                : ($stock->quantity + Unit::convert($quantity, $unitId, $stock->unit_id))
+        ]);
+        return $stock;
     }
 }
