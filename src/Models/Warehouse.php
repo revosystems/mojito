@@ -115,7 +115,7 @@ class Warehouse extends Model
             return null;
         }
 
-        static::updateStock($itemId, $quantity, $toWarehouseId, $stockFrom->unit_id, Warehouse::ACTION_MOVE);
+        static::updateStock($itemId, $toWarehouseId, $quantity, $stockFrom->unit_id);
         $stockFrom->update(["quantity" => $stockFrom->quantity - $quantity]);
         return StockMovement::create([
             'item_id'           => $itemId,
@@ -136,7 +136,7 @@ class Warehouse extends Model
             $itemClass = config('mojito.itemClass', 'Item');
             $unitId = $itemClass::find($itemId)->unit_id;
         }
-        static::updateStock($itemId, $quantity, $this->id, $unitId, Warehouse::ACTION_SET_INVENTORY);
+        static::updateStock($itemId, $this->id, $quantity, $unitId, true);
         return StockMovement::create([
             'item_id'           => $itemId,
             'to_warehouse_id'   => $this->id,
@@ -145,7 +145,7 @@ class Warehouse extends Model
         ]);
     }
 
-    protected static function updateStock(int $itemId, float $quantity, int $warehouseId, int $unitId, int $action)
+    protected static function updateStock(int $itemId, int $warehouseId, float $quantity, int $unitId, bool $shouldSet = false)
     {
         $stockClass = config('mojito.stockClass', 'Stock');
         if (! $stock = $stockClass::where('warehouse_id', '=', $warehouseId)->where('item_id', $itemId)->first()) {
@@ -153,14 +153,12 @@ class Warehouse extends Model
                 'warehouse_id' => $warehouseId,
                 'item_id'      => $itemId,
                 'quantity'     => $quantity,
-                'alert'        => 0,
                 'unit_id'      => $unitId,
+                'alert'        => 0,
             ]);
         }
         $stock->update([
-            "quantity" => $action == static::ACTION_SET_INVENTORY
-                ? $quantity
-                : ($stock->quantity + Unit::convert($quantity, $unitId, $stock->unit_id))
+            "quantity" => $shouldSet ? $quantity : ($stock->quantity + Unit::convert($quantity, $unitId, $stock->unit_id))
         ]);
         return $stock;
     }
