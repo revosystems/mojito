@@ -2,7 +2,7 @@
 
 namespace BadChoice\Mojito\Models;
 
-use BadChoice\Mojito\Services\PurchaseOrders\VendorAutomaticPurchaseOrder;
+use BadChoice\Mojito\Services\PurchaseOrders\ItemsForAVendorPurchaseOrder;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -68,9 +68,9 @@ class Vendor extends Model
         ]);
     }
 
-    public function automaticPurchaseOrder($belowAlert = true)
+    public function automaticPurchaseOrder($dontValidateBelowAlert = true)
     {
-        return (new VendorAutomaticPurchaseOrder($this))->get($belowAlert);
+        return (new ItemsForAVendorPurchaseOrder($this, !$dontValidateBelowAlert))->get();
     }
 
     public function delete()
