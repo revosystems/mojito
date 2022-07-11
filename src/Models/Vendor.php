@@ -2,6 +2,7 @@
 
 namespace BadChoice\Mojito\Models;
 
+use BadChoice\Mojito\Services\PurchaseOrders\VendorAutomaticPurchaseOrder;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,20 +12,20 @@ class Vendor extends Model
 {
     use SoftDeletes;
     use Notifiable;
-    protected $table        = "vendors";
-    protected $hidden       = ['created_at','updated_at','deleted_at'];
-    protected $guarded      = [];
+    protected $table   = 'vendors';
+    protected $hidden  = ['created_at', 'updated_at', 'deleted_at'];
+    protected $guarded = [];
 
     protected static $rules = [
-        'name'          => 'required|min:3',
-        'address'       => 'required|min:3',
-        'city'          => 'min:3',
-        'state'         => 'min:3',
-        'country'       => 'min:3',
-        'postalCode'    => 'min:3',
+        'name'       => 'required|min:3',
+        'address'    => 'required|min:3',
+        'city'       => 'min:3',
+        'state'      => 'min:3',
+        'country'    => 'min:3',
+        'postalCode' => 'min:3',
         //'nif'           => 'required|between:9,9',
-        'nif'           => 'required|min:3',
-        'email'         => 'email',
+        'nif'   => 'required|min:3',
+        'email' => 'email',
     ];
 
     protected function serializeDate(DateTimeInterface $date)
@@ -37,8 +38,8 @@ class Vendor extends Model
     //============================================================================
     public static function canBeDeleted($id)
     {
-        if (count(Vendor::find($id)->orders) > 0) {
-            throw new \Exception("Vendor has orders");
+        if (count(self::find($id)->orders) > 0) {
+            throw new \Exception('Vendor has orders');
         }
         return true;
     }
@@ -62,46 +63,14 @@ class Vendor extends Model
     public function addItem($item_id, $unit_id)
     {
         $this->items()->attach($item_id, [
-            "unit_id" => $unit_id,
-            "pack"    => 1,
+            'unit_id' => $unit_id,
+            'pack'    => 1,
         ]);
     }
 
     public function automaticPurchaseOrder($belowAlert = true)
     {
-        $toReturn = [];
-        foreach ($this->items as $item) {
-            $totalQty       = 0;
-            $totalDefault   = 0;
-            $totalAlert     = 0;
-            foreach ($item->warehouses as $warehouse) {
-                $totalQty += $warehouse->pivot->quantity;
-                $totalDefault += $warehouse->pivot->defaultQuantity;
-                $totalAlert += $warehouse->pivot->alert;
-            }
-
-            $toRefill = $totalDefault - $totalQty;
-
-            if ($toRefill <= 0 || $totalDefault == 0) {
-                continue;
-            }
-
-            if (! $belowAlert && $totalQty > $totalAlert) {
-                continue;
-            }
-
-            $toRefill = $item->pivot->pack * ceil($toRefill / $item->pivot->pack);  //Minium pack size
-
-            $toReturn[$item->id] = [
-                "name"      => $item->name,
-                "costPrice" => $item->pivot->costPrice,
-                "pivot_id"  => $item->pivot->id,
-                "quantity"  => $toRefill,
-                "pack"      => $item->pivot->pack,
-                "unit"      => Unit::find($item->pivot->unit_id)->name,
-            ];
-        }
-        return $toReturn;
+        return (new VendorAutomaticPurchaseOrder($this))->get($belowAlert);
     }
 
     public function delete()
