@@ -4,7 +4,6 @@ namespace BadChoice\Mojito\Services\PurchaseOrders;
 
 use BadChoice\Mojito\Models\Unit;
 use BadChoice\Mojito\Models\Vendor;
-use BadChoice\Mojito\Models\Warehouse;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
@@ -16,29 +15,29 @@ class ItemsForAVendorPurchaseOrder
     {
     }
 
-    public function get(Warehouse $warehouse = null): Collection
+    public function get(?Collection $warehouses = null): Collection
     {
-        return $this->itemsWithMissingStock($warehouse)->mapWithKeys(function ($item) {
+        return $this->itemsWithMissingStock($warehouses)->mapWithKeys(function ($item) {
             return self::toArray($item, $item->stocks);
         });
     }
 
-    protected function itemsWithMissingStock(?Warehouse $warehouse): \Illuminate\Database\Eloquent\Collection
+    protected function itemsWithMissingStock(?Collection $warehouses): \Illuminate\Database\Eloquent\Collection
     {
         return $this->vendor->items()
             /** TODO: Change to withWhereHas when it's available */
-            ->whereHas('stocks', fn ($stocksQuery) => $this->stocksQuery($stocksQuery, $warehouse))
-            ->with('stocks', fn ($stocksQuery) => $this->stocksQuery($stocksQuery, $warehouse))
+            ->whereHas('stocks', fn ($stocksQuery) => $this->stocksQuery($stocksQuery, $warehouses))
+            ->with('stocks', fn ($stocksQuery) => $this->stocksQuery($stocksQuery, $warehouses))
             ->get();
     }
 
-    public function stocksQuery(Builder|HasMany $stocksQuery, ?Warehouse $warehouse)
+    public function stocksQuery(Builder|HasMany $stocksQuery, ?Collection $warehouses)
     {
         return $stocksQuery
             ->where('defaultQuantity', '>', 0)
             ->where('quantity', '<', DB::raw('defaultQuantity'))
             ->when($this->validatesBelowAlert, fn ($stocksQuery) => $stocksQuery->where('quantity', '<=', DB::raw('alert')))
-            ->when($warehouse, fn ($stocksQuery) => $stocksQuery->where('warehouse_id', $warehouse->id));
+            ->when($warehouses && $warehouses->isNotEmpty(), fn ($stocksQuery) => $stocksQuery->whereIn('warehouse_id', $warehouses->pluck('id')));
     }
 
     public static function toArray($item, Collection $stocks): array
