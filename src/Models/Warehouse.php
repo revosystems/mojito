@@ -97,7 +97,8 @@ class Warehouse extends Model
         }
         $quantity    = Unit::convert($quantity, $unitId, $stock->unit_id);
         $stock->update(["quantity" => $stock->quantity + $quantity]);
-        return StockMovement::create([
+        $stockMovementClass = config('mojito.stockMovementClass', 'StockMovement');
+        return $stockMovementClass::create([
             'item_id'           => $itemId,
             'to_warehouse_id'   => $this->id,
             'quantity'          => $quantity,
@@ -117,7 +118,8 @@ class Warehouse extends Model
 
         static::updateStock($itemId, $toWarehouseId, $quantity, $stockFrom->unit_id);
         $stockFrom->update(["quantity" => $stockFrom->quantity - $quantity]);
-        return StockMovement::create([
+        $stockMovementClass = config('mojito.stockMovementClass', 'StockMovement');
+        return $stockMovementClass::create([
             'item_id'           => $itemId,
             'from_warehouse_id' => $this->id,
             'to_warehouse_id'   => $toWarehouseId,
@@ -137,7 +139,8 @@ class Warehouse extends Model
             $unitId = $itemClass::find($itemId)->unit_id;
         }
         static::updateStock($itemId, $this->id, $quantity, $unitId, true);
-        return StockMovement::create([
+        $stockMovementClass = config('mojito.stockMovementClass', 'StockMovement');
+        return $stockMovementClass::create([
             'item_id'           => $itemId,
             'to_warehouse_id'   => $this->id,
             'quantity'          => $quantity,
