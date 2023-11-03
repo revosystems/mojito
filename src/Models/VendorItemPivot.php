@@ -3,10 +3,10 @@
 namespace BadChoice\Mojito\Models;
 
 use DateTimeInterface;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class VendorItemPivot extends Model
+class VendorItemPivot extends Pivot
 {
     use SoftDeletes;
 
@@ -73,5 +73,19 @@ class VendorItemPivot extends Model
     public function tax()
     {
         return $this->belongsTo(config('mojito.taxClass', 'Tax'), 'tax_id');
+    }
+
+    public static function findWith($vendorId, $itemId, bool $withTrashed = false)
+    {
+        return self::query()
+            ->when($withTrashed === true, fn($query) => $query->withTrashed())
+            ->where('item_id', $itemId)
+            ->where('vendor_id', $vendorId)
+            ->first();
+    }
+
+    public static function softDelete($itemId, $priceId)
+    {
+        self::findWith($itemId, $priceId)->delete();
     }
 }
