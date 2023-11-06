@@ -49,7 +49,11 @@ class Vendor extends Model
     //============================================================================
     public function items()
     {
-        return $this->belongsToMany(config('mojito.itemClass', 'Item'), config('mojito.vendorItemsTable'), 'vendor_id', 'item_id')->withPivot('id', 'costPrice', 'unit_id', 'reference', 'tax_id', 'pack')->wherePivot('deleted_at', '=', null);
+        return $this->belongsToMany(config('mojito.itemClass', 'Item'), config('mojito.vendorItemsTable'), 'vendor_id', 'item_id')
+            ->withPivot('id', 'costPrice', 'unit_id', 'reference', 'tax_id', 'pack')
+            ->withTimestamps()
+            ->wherePivotNull('deleted_at')
+            ->using(config('mojito.vendorItemClass', 'VendorItemPivot'));
     }
 
     public function orders()
