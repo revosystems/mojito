@@ -61,13 +61,13 @@ class PurchaseOrderContent extends Model
     public function item()
     {
         return $this->hasOneThrough(
-            config('mojito.itemClass'),
-            config('mojito.vendorItemClass', VendorItemPivot::class),
-            'id',
-            'id',
-            'item_vendor_id',
-            'item_id'
-        )->withTrashed();
+            related: config('mojito.itemClass'),
+            through: config('mojito.vendorItemClass', VendorItemPivot::class),
+            firstKey: 'id',
+            secondKey: 'id',
+            localKey: 'item_vendor_id',
+            secondLocalKey: 'item_id'
+        );
     }
 
     public function vendorItem()
