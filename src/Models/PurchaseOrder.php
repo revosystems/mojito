@@ -106,8 +106,10 @@ class PurchaseOrder extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('status', '=', PurchaseOrderStatus::STATUS_PENDING)
-                     ->orWhere('status', '=', PurchaseOrderStatus::STATUS_PARTIAL_RECEIVED);
+        return $query->where(fn ($q) =>
+            $q->where('status', '=', PurchaseOrderStatus::STATUS_PENDING)
+                ->orWhere('status', '=', PurchaseOrderStatus::STATUS_PARTIAL_RECEIVED)
+        );
     }
 
     //============================================================================
