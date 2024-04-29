@@ -149,7 +149,7 @@ class PurchaseOrderContent extends Model
     public function calculateStatus()
     {
         $leftToReceive  = $this->quantity - $this->received;
-        if ($this->status == PurchaseOrderStatus::STATUS_DRAFT) {
+        if ($this->status === PurchaseOrderStatus::STATUS_DRAFT) {
             return PurchaseOrderStatus::STATUS_DRAFT;
         } elseif ($leftToReceive == 0) {
             return PurchaseOrderStatus::STATUS_RECEIVED;

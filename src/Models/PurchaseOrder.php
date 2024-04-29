@@ -161,7 +161,7 @@ class PurchaseOrder extends Model
             $leftToReceive = $content->quantity - $content->received;
             return $leftToReceive < 0 ? 0 : $leftToReceive;
         });
-        if ($this->status == PurchaseOrderStatus::STATUS_DRAFT) {
+        if ($this->status === PurchaseOrderStatus::STATUS_DRAFT) {
             return PurchaseOrderStatus::STATUS_DRAFT;
         } elseif ($leftToReceive <= 0) {
             return PurchaseOrderStatus::STATUS_RECEIVED;
@@ -180,7 +180,7 @@ class PurchaseOrder extends Model
 
     public function shouldBeSent()
     {
-        return $this->status == PurchaseOrderStatus::STATUS_PENDING;
+        return $this->status === PurchaseOrderStatus::STATUS_PENDING;
     }
 
     public function send()
