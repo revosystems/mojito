@@ -31,4 +31,15 @@ enum PurchaseOrderStatus: int
             self::STATUS_DRAFT            => __('admin.draft'),
         };
     }
+
+    public static function statusArray()
+    {
+        return [
+            PurchaseOrderStatus::STATUS_PENDING->value          => __('admin.pending'),
+            PurchaseOrderStatus::STATUS_SENT->value             => __('admin.sent'),
+            PurchaseOrderStatus::STATUS_PARTIAL_RECEIVED->value => __('admin.partialReceived'),
+            PurchaseOrderStatus::STATUS_RECEIVED->value         => __('admin.received'),
+            PurchaseOrderStatus::STATUS_DRAFT->value            => __('admin.draft'),
+        ];
+    }
 }
