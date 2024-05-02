@@ -4,7 +4,7 @@ namespace BadChoice\Mojito\Services\PurchaseOrders;
 
 use BadChoice\Mojito\Models\PurchaseOrder;
 use BadChoice\Mojito\Models\PurchaseOrderContent;
-use BadChoice\Mojito\Models\VendorItemPivot;
+use BadChoice\Mojito\Enums\PurchaseOrderStatus;
 
 class PurchaseOrderHandler
 {
@@ -114,7 +114,7 @@ class PurchaseOrderHandler
             "order_id"          => $this->purchaseOrder->id,
             "item_vendor_id"    => $this->findOrCreateVendor($toReceive)->id,
             "quantity"          => $toReceive->expectedQuantity,
-            "status"            => PurchaseOrderContent::STATUS_PENDING
+            "status"            => PurchaseOrderStatus::STATUS_PENDING
         ]);
     }
 

@@ -5,6 +5,7 @@ namespace BadChoice\Mojito\Models;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use BadChoice\Mojito\Enums\PurchaseOrderStatus;
 
 class PurchaseOrderContent extends Model
 {
@@ -15,11 +16,9 @@ class PurchaseOrderContent extends Model
     protected $appends  = ['itemName', 'itemBarcode', 'item_id'];
     protected $hidden   = ['item', 'vendorItem'];
 
-    const STATUS_PENDING            = 0;
-    const STATUS_SENT               = 1;
-    const STATUS_PARTIAL_RECEIVED   = 2;
-    const STATUS_RECEIVED           = 3;
-    const STATUS_DRAFT              = 4;
+    protected $casts = [
+        'status' => PurchaseOrderStatus::class,
+    ];
 
     //============================================================================
     // REGISTER EVENT LISTENRES
@@ -105,13 +104,13 @@ class PurchaseOrderContent extends Model
         $warehouse->add($this->vendorItem->item_id, $quantity, $this->vendorItem->unit_id);
 
         $totalReceived = $this->received + $quantity;
-        $status        = static::STATUS_PENDING;
+        $status        = PurchaseOrderStatus::STATUS_PENDING;
 
         if ($totalReceived < $this->quantity) {
-            $status = static::STATUS_PARTIAL_RECEIVED;
+            $status = PurchaseOrderStatus::STATUS_PARTIAL_RECEIVED;
         }
         if ($totalReceived >= $this->quantity) {
-            $status = static::STATUS_RECEIVED;
+            $status = PurchaseOrderStatus::STATUS_RECEIVED;
         }
 
         $this->update([
@@ -119,27 +118,6 @@ class PurchaseOrderContent extends Model
             'status'   => $status,
         ]);
         $this->order->touch();
-    }
-
-    public function statusName()
-    {
-        return static::getStatusName($this->status);
-    }
-
-    public static function getStatusName($status)
-    {
-        return static::statusArray()[$status] ?? '?';
-    }
-
-    public static function statusArray()
-    {
-        return [
-            static::STATUS_PENDING              => __('admin.pending'),
-            static::STATUS_SENT                 => __('admin.sent'),
-            static::STATUS_PARTIAL_RECEIVED     => __('admin.partialReceived'),
-            static::STATUS_RECEIVED             => __('admin.received'),
-            static::STATUS_DRAFT                => __('admin.draft'),
-        ];
     }
 
     public function updatePrice($price)
@@ -160,14 +138,14 @@ class PurchaseOrderContent extends Model
     public function calculateStatus()
     {
         $leftToReceive  = $this->quantity - $this->received;
-        if ($this->status == PurchaseOrderContent::STATUS_DRAFT) {
-            return PurchaseOrderContent::STATUS_DRAFT;
+        if ($this->status === PurchaseOrderStatus::STATUS_DRAFT) {
+            return PurchaseOrderStatus::STATUS_DRAFT;
         } elseif ($leftToReceive == 0) {
-            return PurchaseOrderContent::STATUS_RECEIVED;
+            return PurchaseOrderStatus::STATUS_RECEIVED;
         } elseif ($leftToReceive == $this->quantity) {
-            return PurchaseOrderContent::STATUS_PENDING;
+            return PurchaseOrderStatus::STATUS_PENDING;
         }
-        return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
+        return PurchaseOrderStatus::STATUS_PARTIAL_RECEIVED;
     }
 
     private function adjustStock($leftToReceive, $warehouseId)

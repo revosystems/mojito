@@ -5,6 +5,7 @@ namespace BadChoice\Mojito\Models;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use BadChoice\Mojito\Enums\PurchaseOrderStatus;
 
 class PurchaseOrder extends Model
 {
@@ -14,6 +15,10 @@ class PurchaseOrder extends Model
     protected $guarded  = [];
     protected $appends  = ['vendorName', 'contentsArray'];
     protected $hidden   = ['vendor', 'contents'];
+
+    protected $casts = [
+        'status' => PurchaseOrderStatus::class,
+    ];
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -25,7 +30,7 @@ class PurchaseOrder extends Model
         return true;
     }
 
-    public static function createWith($vendor_id, $items, $status = PurchaseOrderContent::STATUS_PENDING)
+    public static function createWith($vendor_id, $items, $status = PurchaseOrderStatus::STATUS_PENDING)
     {
         if (! count($items)) {
             return null;
@@ -47,7 +52,7 @@ class PurchaseOrder extends Model
         return $order;
     }
 
-    public static function updateWith($order, $items, $status = PurchaseOrderContent::STATUS_PENDING)
+    public static function updateWith($order, $items, $status = PurchaseOrderStatus::STATUS_PENDING)
     {
         if (! count($items)) {
             return null;
@@ -101,8 +106,10 @@ class PurchaseOrder extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('status', '=', PurchaseOrderContent::STATUS_PENDING)
-                     ->orWhere('status', '=', PurchaseOrderContent::STATUS_PARTIAL_RECEIVED);
+        return $query->where(fn ($q) =>
+            $q->where('status', '=', PurchaseOrderStatus::STATUS_PENDING)
+                ->orWhere('status', '=', PurchaseOrderStatus::STATUS_PARTIAL_RECEIVED)
+        );
     }
 
     //============================================================================
@@ -156,19 +163,14 @@ class PurchaseOrder extends Model
             $leftToReceive = $content->quantity - $content->received;
             return $leftToReceive < 0 ? 0 : $leftToReceive;
         });
-        if ($this->status == PurchaseOrderContent::STATUS_DRAFT) {
-            return PurchaseOrderContent::STATUS_DRAFT;
+        if ($this->status === PurchaseOrderStatus::STATUS_DRAFT) {
+            return PurchaseOrderStatus::STATUS_DRAFT;
         } elseif ($leftToReceive <= 0) {
-            return PurchaseOrderContent::STATUS_RECEIVED;
+            return PurchaseOrderStatus::STATUS_RECEIVED;
         } elseif ($leftToReceive == $total) {
-            return PurchaseOrderContent::STATUS_PENDING;
+            return PurchaseOrderStatus::STATUS_PENDING;
         }
-        return PurchaseOrderContent::STATUS_PARTIAL_RECEIVED;
-    }
-
-    public function statusName()
-    {
-        return PurchaseOrderContent::getStatusName($this->status);
+        return PurchaseOrderStatus::STATUS_PARTIAL_RECEIVED;
     }
 
     public function receiveAll($warehouse_id)
@@ -180,7 +182,7 @@ class PurchaseOrder extends Model
 
     public function shouldBeSent()
     {
-        return $this->status == PurchaseOrderContent::STATUS_PENDING;
+        return $this->status === PurchaseOrderStatus::STATUS_PENDING;
     }
 
     public function send()
