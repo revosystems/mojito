@@ -82,8 +82,13 @@ class PurchaseOrder extends Model
         $order = PurchaseOrder::find($orderData->id);
         $order->update([
             'created_at' => $orderData->created_at ?? $order->created_at,
-            'reference' => $orderData->reference ?? $order->reference,
         ]);
+
+        if(isset($order->reference)){
+            $order->update([
+                'reference' => $orderData->reference ?? $order->reference
+            ]);
+        }
         
         if ($order->shouldBeSent()) {
             $order->send();
