@@ -81,9 +81,8 @@ class PurchaseOrder extends Model
     public static function updateOrderInfo($orderData) {
         $order = PurchaseOrder::find($orderData->id);
         $order->update([
-            'created_at' => $orderData->created_at,
-            'updated_at' => Carbon::now(),
-            'reference' => $orderData->reference,
+            'created_at' => $orderData->created_at ?? $order->created_at,
+            'reference' => $orderData->reference ?? $order->reference,
         ]);
         
         if ($order->shouldBeSent()) {
