@@ -78,7 +78,7 @@ class PurchaseOrder extends Model
         return $order;
     }
 
-    public static function updateOrderInfo($orderData) {
+    public static function updateOrderInfo(object $orderData) {
         $order = PurchaseOrder::find($orderData->id);
         $update = [
             'created_at' => $orderData->created_at ?? $order->created_at,
