@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f8b3088818df147a63532419f24c8177",
+    "content-hash": "71f4bd81a57e32f0aa9029a993aca5f4",
     "packages": [
         {
             "name": "brick/math",
@@ -492,59 +492,6 @@
                 }
             ],
             "time": "2020-04-13T13:17:36+00:00"
-        },
-        {
-            "name": "khill/fontawesomephp",
-            "version": "1.1.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kevinkhill/FontAwesomePHP.git",
-                "reference": "8d26204b7e8091136c0ffe490b976ac50d01e6b7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kevinkhill/FontAwesomePHP/zipball/8d26204b7e8091136c0ffe490b976ac50d01e6b7",
-                "reference": "8d26204b7e8091136c0ffe490b976ac50d01e6b7",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.8",
-                "satooshi/php-coveralls": "~1.0",
-                "squizlabs/php_codesniffer": "~2.5"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Khill\\FontAwesome\\Laravel\\FontAwesomeServiceProvider"
-                    ],
-                    "aliases": {
-                        "FA": "Khill\\FontAwesome\\Laravel\\FontAwesomeFacade"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Khill\\FontAwesome\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kevin Hill",
-                    "email": "kevinkhill@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "PHP wrapper library for the fantastic Font Awesome icon set.",
-            "support": {
-                "issues": "https://github.com/kevinkhill/FontAwesomePHP/issues",
-                "source": "https://github.com/kevinkhill/FontAwesomePHP/tree/1.1.5"
-            },
-            "time": "2018-02-05T17:31:32+00:00"
         },
         {
             "name": "laravel/framework",
@@ -1787,25 +1734,24 @@
         },
         {
             "name": "revosystems/grog",
-            "version": "8.43.1",
+            "version": "11.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/revosystems/grog.git",
-                "reference": "6ac05f7a2c2158528a116ceb128fab38aaf281a0"
+                "reference": "3328e9e2743258152215ba341616ac905e48eb0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/revosystems/grog/zipball/6ac05f7a2c2158528a116ceb128fab38aaf281a0",
-                "reference": "6ac05f7a2c2158528a116ceb128fab38aaf281a0",
+                "url": "https://api.github.com/repos/revosystems/grog/zipball/3328e9e2743258152215ba341616ac905e48eb0e",
+                "reference": "3328e9e2743258152215ba341616ac905e48eb0e",
                 "shasum": ""
             },
             "require": {
                 "goodby/csv": "1.2.0",
-                "khill/fontawesomephp": "1.1.x",
-                "laravel/framework": "8.x",
+                "laravel/framework": "8.x|9.x|10.x",
                 "laravel/helpers": "^1.2",
                 "laravelcollective/html": "^6.1",
-                "php": "^7.3"
+                "php": "^8.1"
             },
             "type": "library",
             "autoload": {
@@ -1822,9 +1768,9 @@
             ],
             "description": "Easy form builder from array",
             "support": {
-                "source": "https://github.com/revosystems/grog/tree/8.43.1"
+                "source": "https://github.com/revosystems/grog/tree/11.0.4"
             },
-            "time": "2021-06-10T11:19:30+00:00"
+            "time": "2024-05-08T13:32:05+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -4348,8 +4294,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.3"
+        "php": "^8.1"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.0.0"
+    "plugin-api-version": "2.6.0"
 }

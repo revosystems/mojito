@@ -6,6 +6,7 @@ use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use BadChoice\Mojito\Enums\PurchaseOrderStatus;
+use Carbon\Carbon;
 
 class PurchaseOrder extends Model
 {
@@ -71,6 +72,24 @@ class PurchaseOrder extends Model
                 'quantity' => $item->quantity,
             ]);
         });
+        if ($order->shouldBeSent()) {
+            $order->send();
+        }
+        return $order;
+    }
+
+    public static function updateOrderInfo(object $orderData) {
+        $order = PurchaseOrder::find($orderData->id);
+        $update = [
+            'created_at' => $orderData->created_at ?? $order->created_at,
+        ];
+
+        if(isset($order->reference)){
+            $update['reference'] = $orderData->reference ?? $order->reference;
+        }
+
+        $order->update($update);
+
         if ($order->shouldBeSent()) {
             $order->send();
         }
