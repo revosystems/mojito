@@ -80,14 +80,10 @@ class PurchaseOrder extends Model
 
     public static function updateOrderInfo(object $orderData) {
         $order = PurchaseOrder::find($orderData->id);
-        $update = [
+        $update = array_filter([
             'created_at' => $orderData->created_at ?? $order->created_at,
             'reference'  => $orderData->reference ?? $order->reference,
-        ];
-
-        if(! $update['reference']){
-            unset($update['reference']);
-        }
+        ]);
 
         $order->update($update);
 
