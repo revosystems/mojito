@@ -12,19 +12,21 @@ class Warehouse extends Model
 {
     use SoftDeletes;
 
-    protected $table        = "warehouses";
-    protected $dates        = ['deleted_at'];
-    protected $hidden       = ['created_at','updated_at','deleted_at','unit_id'];
-    protected $guarded      = [];
+    protected $table = "warehouses";
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+    protected $hidden = ['created_at','updated_at','deleted_at','unit_id'];
+    protected $guarded = [];
 
     protected static $rules = [
         'name'  => 'required|min:3',
     ];
 
-    const ACTION_ADD                = 0;
-    const ACTION_MOVE               = 1;
-    const ACTION_SET_INVENTORY      = 2;
-    const ACTION_SALE               = 3;
+    const ACTION_ADD           = 0;
+    const ACTION_MOVE          = 1;
+    const ACTION_SET_INVENTORY = 2;
+    const ACTION_SALE          = 3;
 
     protected function serializeDate(DateTimeInterface $date)
     {

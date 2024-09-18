@@ -12,9 +12,11 @@ class Stock extends Model
     use SoftDeletes;
     use SyncTrait;
 
-    protected $dates            = ['deleted_at'];
-    protected $hidden           = ['created_at','updated_at','deleted_at'];
-    protected $guarded          = [];
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+    protected $hidden = ['created_at','updated_at','deleted_at'];
+    protected $guarded = [];
 
     protected static $rules = [
         'alert'     => 'integer',
