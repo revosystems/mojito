@@ -16,7 +16,9 @@ class Inventory extends Model
     const STATUS_APPROVED   = 3;
     const STATUS_DECLINED   = 4;
 
-    protected $dates   = ["closed_at"];
+    protected $casts = [
+        'closed_at' => 'datetime',
+    ];
     protected $guarded = [];
 
     use SoftDeletes;

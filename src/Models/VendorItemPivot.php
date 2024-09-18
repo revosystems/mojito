@@ -11,9 +11,11 @@ class VendorItemPivot extends Pivot
     use SoftDeletes;
 
     public $incrementing = true;
-    protected $dates        = ['deleted_at'];
-    protected $hidden       = ['created_at','updated_at','deleted_at'];
-    protected $guarded      = [];
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+    protected $hidden = ['created_at','updated_at','deleted_at'];
+    protected $guarded = [];
 
     protected static $rules = [
         'costPrice'     => 'required|numeric',

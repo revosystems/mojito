@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Assembly extends Pivot
 {
     protected $table    = "assemblies";
-    protected $dates    = ['deleted_at'];
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
     protected $hidden   = ['created_at','updated_at','deleted_at'];
     protected $guarded  = [];
 
