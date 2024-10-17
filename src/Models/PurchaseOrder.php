@@ -174,19 +174,33 @@ class PurchaseOrder extends Model
      */
     public function calculateStatus()
     {
-        $total          = $this->contents->sum('quantity');
-        $leftToReceive  = $this->contents->sum(function ($content) {
+        $contents = $this->contents->reject(fn(PurchaseOrderContent $content) => $content->status === PurchaseOrderStatus::STATUS_PARTIAL_COMPLETED);
+        $total          = $contents->sum('quantity');
+        $leftToReceive  = $contents->sum(function ($content) {
             $leftToReceive = $content->quantity - $content->received;
             return $leftToReceive < 0 ? 0 : $leftToReceive;
         });
+
         if ($this->status === PurchaseOrderStatus::STATUS_DRAFT) {
             return PurchaseOrderStatus::STATUS_DRAFT;
-        } elseif ($leftToReceive <= 0) {
-            return PurchaseOrderStatus::STATUS_RECEIVED;
-        } elseif ($leftToReceive == $total) {
+        } 
+
+        if ($leftToReceive <= 0) {
+            return $this->hasAContentPartiallyCompleted() 
+                ? PurchaseOrderStatus::STATUS_PARTIAL_COMPLETED 
+                : PurchaseOrderStatus::STATUS_COMPLETED;
+        } 
+        
+        if ($leftToReceive == $total) {
             return PurchaseOrderStatus::STATUS_PENDING;
         }
+
         return PurchaseOrderStatus::STATUS_PARTIAL_RECEIVED;
+    }
+
+    protected function hasAContentPartiallyCompleted(): bool
+    {
+        return $this->contents->contains(fn(PurchaseOrderContent $content) => $content->status === PurchaseOrderStatus::STATUS_PARTIAL_COMPLETED);
     }
 
     public function receiveAll($warehouse_id)
