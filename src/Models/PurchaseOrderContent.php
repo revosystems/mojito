@@ -110,7 +110,7 @@ class PurchaseOrderContent extends Model
             $status = PurchaseOrderStatus::STATUS_PARTIAL_RECEIVED;
         }
         if ($totalReceived >= $this->quantity) {
-            $status = PurchaseOrderStatus::STATUS_RECEIVED;
+            $status = PurchaseOrderStatus::STATUS_COMPLETED;
         }
 
         $this->update([
@@ -141,7 +141,7 @@ class PurchaseOrderContent extends Model
         if ($this->status === PurchaseOrderStatus::STATUS_DRAFT) {
             return PurchaseOrderStatus::STATUS_DRAFT;
         } elseif ($leftToReceive == 0) {
-            return PurchaseOrderStatus::STATUS_RECEIVED;
+            return PurchaseOrderStatus::STATUS_COMPLETED;
         } elseif ($leftToReceive == $this->quantity) {
             return PurchaseOrderStatus::STATUS_PENDING;
         }
@@ -154,5 +154,10 @@ class PurchaseOrderContent extends Model
             return;
         }
         Warehouse::find($warehouseId)->add($this->vendorItem->item_id, $leftToReceive, $this->vendorItem->unit_id);
+    }
+
+    public function partiallyComplete()
+    {
+        $this->update(['status' => PurchaseOrderStatus::STATUS_PARTIAL_COMPLETED]);
     }
 }

@@ -11,11 +11,14 @@ Here's how you can add the safelist in your tailwind.config.js file:
 ```php
     // All the colors are used for the PurchaseOrderStatus enum.
     safelist: [
-        'bg-blue-400',
-        'bg-yellow-400',
-        'bg-red-400',
-        'bg-gray-600',
-        'bg-gray-300'
+        'text-blue-800',
+        'bg-blue-400/20',
+        'text-yellow-800',
+        'bg-yellow-400/20',
+        'text-green-800',
+        'bg-green-400/20'
+        'text-zinc-800',
+        'bg-zinc-400/20'
     ],
 ```
 
