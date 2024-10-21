@@ -16,7 +16,7 @@ Here's how you can add the safelist in your tailwind.config.js file:
         'text-yellow-800',
         'bg-yellow-400/20',
         'text-green-800',
-        'bg-green-400/20'
+        'bg-green-400/20',
         'text-zinc-800',
         'bg-zinc-400/20'
     ],
