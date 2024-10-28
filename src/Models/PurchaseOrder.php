@@ -205,9 +205,13 @@ class PurchaseOrder extends Model
 
     public function receiveAll($warehouse_id)
     {
-        $this->contents()->with('vendorItem', 'order')->get()->each(function ($content) use ($warehouse_id) {
-            $content->receive($content->quantity - $content->received, $warehouse_id);
-        });
+        $this->contents()
+            ->with('vendorItem', 'order')
+            ->get()
+            ->filter(fn (PurchaseOrderContent $content) => $content->status !== PurchaseOrderStatus::STATUS_PARTIAL_COMPLETED && $content->status !== PurchaseOrderStatus::STATUS_COMPLETED)
+            ->each(function (PurchaseOrderContent $content) use ($warehouse_id) {
+                $content->receive($content->quantity - $content->received, $warehouse_id);
+            });
     }
 
     public function shouldBeSent()
