@@ -207,8 +207,8 @@ class PurchaseOrder extends Model
     {
         $this->contents()
             ->with('vendorItem', 'order')
+            ->whereNotIn('status', [PurchaseOrderStatus::STATUS_PARTIAL_COMPLETED, PurchaseOrderStatus::STATUS_COMPLETED])
             ->get()
-            ->filter(fn (PurchaseOrderContent $content) => $content->status !== PurchaseOrderStatus::STATUS_PARTIAL_COMPLETED && $content->status !== PurchaseOrderStatus::STATUS_COMPLETED)
             ->each(function (PurchaseOrderContent $content) use ($warehouse_id) {
                 $content->receive($content->quantity - $content->received, $warehouse_id);
             });
