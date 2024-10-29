@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "71f4bd81a57e32f0aa9029a993aca5f4",
+    "content-hash": "9137df659e413fef6b8271ffd301b0e0",
     "packages": [
         {
             "name": "brick/math",
@@ -716,78 +716,6 @@
                 "source": "https://github.com/laravel/helpers/tree/v1.4.1"
             },
             "time": "2021-02-16T15:27:11+00:00"
-        },
-        {
-            "name": "laravelcollective/html",
-            "version": "v6.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/LaravelCollective/html.git",
-                "reference": "ae15b9c4bf918ec3a78f092b8555551dd693fde3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/LaravelCollective/html/zipball/ae15b9c4bf918ec3a78f092b8555551dd693fde3",
-                "reference": "ae15b9c4bf918ec3a78f092b8555551dd693fde3",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/http": "^6.0|^7.0|^8.0",
-                "illuminate/routing": "^6.0|^7.0|^8.0",
-                "illuminate/session": "^6.0|^7.0|^8.0",
-                "illuminate/support": "^6.0|^7.0|^8.0",
-                "illuminate/view": "^6.0|^7.0|^8.0",
-                "php": ">=7.2.5"
-            },
-            "require-dev": {
-                "illuminate/database": "^6.0|^7.0|^8.0",
-                "mockery/mockery": "~1.0",
-                "phpunit/phpunit": "~8.5"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "6.x-dev"
-                },
-                "laravel": {
-                    "providers": [
-                        "Collective\\Html\\HtmlServiceProvider"
-                    ],
-                    "aliases": {
-                        "Form": "Collective\\Html\\FormFacade",
-                        "Html": "Collective\\Html\\HtmlFacade"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Collective\\Html\\": "src/"
-                },
-                "files": [
-                    "src/helpers.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Adam Engebretson",
-                    "email": "adam@laravelcollective.com"
-                },
-                {
-                    "name": "Taylor Otwell",
-                    "email": "taylorotwell@gmail.com"
-                }
-            ],
-            "description": "HTML and Form Builders for the Laravel Framework",
-            "homepage": "https://laravelcollective.com",
-            "support": {
-                "issues": "https://github.com/LaravelCollective/html/issues",
-                "source": "https://github.com/LaravelCollective/html"
-            },
-            "time": "2020-12-15T20:20:05+00:00"
         },
         {
             "name": "league/commonmark",
@@ -1734,23 +1662,22 @@
         },
         {
             "name": "revosystems/grog",
-            "version": "11.0.4",
+            "version": "12.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/revosystems/grog.git",
-                "reference": "3328e9e2743258152215ba341616ac905e48eb0e"
+                "reference": "078a0409fb52cfc24d6bc4d1383c3536d50e64df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/revosystems/grog/zipball/3328e9e2743258152215ba341616ac905e48eb0e",
-                "reference": "3328e9e2743258152215ba341616ac905e48eb0e",
+                "url": "https://api.github.com/repos/revosystems/grog/zipball/078a0409fb52cfc24d6bc4d1383c3536d50e64df",
+                "reference": "078a0409fb52cfc24d6bc4d1383c3536d50e64df",
                 "shasum": ""
             },
             "require": {
                 "goodby/csv": "1.2.0",
-                "laravel/framework": "8.x|9.x|10.x",
+                "laravel/framework": "8.x|9.x|10.x|11.x",
                 "laravel/helpers": "^1.2",
-                "laravelcollective/html": "^6.1",
                 "php": "^8.1"
             },
             "type": "library",
@@ -1768,9 +1695,9 @@
             ],
             "description": "Easy form builder from array",
             "support": {
-                "source": "https://github.com/revosystems/grog/tree/11.0.4"
+                "source": "https://github.com/revosystems/grog/tree/12.0.1"
             },
-            "time": "2024-05-08T13:32:05+00:00"
+            "time": "2024-09-30T08:20:03+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
